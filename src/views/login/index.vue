@@ -36,6 +36,13 @@
         </el-form-item>
 
         <el-form-item>
+          <div class="login-options">
+            <el-checkbox v-model="loginForm.rememberMe">记住密码</el-checkbox>
+            <el-link type="primary" :underline="false">忘记密码？</el-link>
+          </div>
+        </el-form-item>
+
+        <el-form-item>
           <el-button
             :loading="loading"
             type="primary"
@@ -46,13 +53,55 @@
             {{ loading ? '登录中...' : '登录' }}
           </el-button>
         </el-form-item>
+
+        <el-form-item>
+          <div class="demo-accounts">
+            <el-divider>
+              <span class="demo-text">演示账号</span>
+            </el-divider>
+            <div class="account-list">
+              <el-button
+                size="small"
+                type="info"
+                plain
+                @click="fillAccount('admin')"
+              >
+                管理员
+              </el-button>
+              <el-button
+                size="small"
+                type="info"
+                plain
+                @click="fillAccount('manager')"
+              >
+                物业经理
+              </el-button>
+              <el-button
+                size="small"
+                type="info"
+                plain
+                @click="fillAccount('owner')"
+              >
+                业主
+              </el-button>
+              <el-button
+                size="small"
+                type="info"
+                plain
+                @click="fillAccount('worker')"
+              >
+                维修工
+              </el-button>
+            </div>
+          </div>
+        </el-form-item>
       </el-form>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/stores/user'
@@ -64,8 +113,9 @@ const loginFormRef = ref()
 const loading = ref(false)
 
 const loginForm = reactive({
-  username: 'admin',
-  password: '123456'
+  username: '',
+  password: '',
+  rememberMe: false
 })
 
 const loginRules = reactive({
@@ -78,6 +128,47 @@ const loginRules = reactive({
   ]
 })
 
+// 演示账号配置
+const demoAccounts = {
+  admin: { username: 'admin', password: '123456', name: '系统管理员' },
+  manager: { username: 'manager', password: '123456', name: '物业经理' },
+  owner: { username: 'owner', password: '123456', name: '张三' },
+  worker: { username: 'worker', password: '123456', name: '维修师傅' }
+}
+
+// 填充演示账号
+const fillAccount = (type) => {
+  const account = demoAccounts[type]
+  if (account) {
+    loginForm.username = account.username
+    loginForm.password = account.password
+    ElMessage.success(`已填充${account.name}账号信息`)
+  }
+}
+
+// 保存登录信息到本地存储
+const saveLoginInfo = () => {
+  if (loginForm.rememberMe) {
+    localStorage.setItem('rememberedUsername', loginForm.username)
+    localStorage.setItem('rememberedPassword', loginForm.password)
+  } else {
+    localStorage.removeItem('rememberedUsername')
+    localStorage.removeItem('rememberedPassword')
+  }
+}
+
+// 从本地存储加载登录信息
+const loadLoginInfo = () => {
+  const rememberedUsername = localStorage.getItem('rememberedUsername')
+  const rememberedPassword = localStorage.getItem('rememberedPassword')
+
+  if (rememberedUsername && rememberedPassword) {
+    loginForm.username = rememberedUsername
+    loginForm.password = rememberedPassword
+    loginForm.rememberMe = true
+  }
+}
+
 const handleLogin = async () => {
   if (!loginFormRef.value) return
 
@@ -86,16 +177,26 @@ const handleLogin = async () => {
       loading.value = true
       try {
         await userStore.login(loginForm)
+
+        // 保存登录信息
+        saveLoginInfo()
+
         ElMessage.success('登录成功')
-        router.push('/')
+        router.push('/dashboard')
       } catch (error) {
         console.error('登录失败:', error)
+        ElMessage.error(error.message || '登录失败，请检查用户名和密码')
       } finally {
         loading.value = false
       }
     }
   })
 }
+
+// 组件挂载时加载保存的登录信息
+onMounted(() => {
+  loadLoginInfo()
+})
 </script>
 
 <style lang="scss" scoped>
@@ -132,11 +233,40 @@ const handleLogin = async () => {
     }
 
     .login-form-content {
+      .login-options {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+      }
+
       .login-button {
         width: 100%;
         height: 50px;
         font-size: 16px;
         font-weight: 500;
+      }
+
+      .demo-accounts {
+        width: 100%;
+
+        .demo-text {
+          color: #999;
+          font-size: 12px;
+        }
+
+        .account-list {
+          display: flex;
+          gap: 8px;
+          justify-content: center;
+          flex-wrap: wrap;
+
+          .el-button {
+            flex: 1;
+            min-width: 80px;
+            font-size: 12px;
+          }
+        }
       }
     }
   }

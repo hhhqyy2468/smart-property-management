@@ -79,44 +79,68 @@
           >
             住户管理
           </el-menu-item>
+        </el-sub-menu>
+
+        <!-- 财务管理 -->
+        <el-sub-menu index="/finance" v-permission="{ permission: ['finance:feeType:view', 'finance:bill:view', 'finance:wallet:view'], mode: 'any' }">
+          <template #title>
+            <el-icon><Money /></el-icon>
+            <span>财务管理</span>
+          </template>
           <el-menu-item
-            index="/property/feetype"
-            v-permission="'property:feeType:view'"
+            index="/finance/feetype"
+            v-permission="'finance:feeType:view'"
           >
             费用类型
           </el-menu-item>
           <el-menu-item
-            index="/property/bill"
-            v-permission="'property:bill:view'"
+            index="/finance/bill"
+            v-permission="'finance:bill:view'"
           >
             账单管理
           </el-menu-item>
           <el-menu-item
-            index="/property/wallet"
-            v-permission="'property:wallet:view'"
+            index="/finance/wallet"
+            v-permission="'finance:wallet:view'"
           >
             钱包管理
           </el-menu-item>
+        </el-sub-menu>
+
+        <!-- 服务管理 -->
+        <el-sub-menu index="/service" v-permission="{ permission: ['service:complaint:view', 'service:repair:view'], mode: 'any' }">
+          <template #title>
+            <el-icon><Tools /></el-icon>
+            <span>服务管理</span>
+          </template>
           <el-menu-item
-            index="/property/complaint"
-            v-permission="'property:complaint:view'"
+            index="/service/complaint"
+            v-permission="'service:complaint:view'"
           >
             投诉管理
           </el-menu-item>
           <el-menu-item
-            index="/property/repair"
-            v-permission="'property:repair:view'"
+            index="/service/repair"
+            v-permission="'service:repair:view'"
           >
             维修管理
           </el-menu-item>
+        </el-sub-menu>
+
+        <!-- 资源管理 -->
+        <el-sub-menu index="/resource" v-permission="{ permission: ['property:parking:view', 'property:notice:view'], mode: 'any' }">
+          <template #title>
+            <el-icon><Van /></el-icon>
+            <span>资源管理</span>
+          </template>
           <el-menu-item
-            index="/property/parking"
+            index="/resource/parking"
             v-permission="'property:parking:view'"
           >
             停车管理
           </el-menu-item>
           <el-menu-item
-            index="/property/notice"
+            index="/resource/notice"
             v-permission="'property:notice:view'"
           >
             公告管理
@@ -182,6 +206,17 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAppStore } from '@/stores/app'
 import { useUserStore } from '@/stores/user'
 import { ElMessageBox } from 'element-plus'
+import {
+  House,
+  Setting,
+  OfficeBuilding,
+  Money,
+  Tools,
+  Van,
+  Fold,
+  Expand,
+  ArrowDown
+} from '@element-plus/icons-vue'
 
 const route = useRoute()
 const router = useRouter()
