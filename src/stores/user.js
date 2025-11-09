@@ -283,6 +283,148 @@ export const useUserStore = defineStore('user', {
     updateUserInfo(userInfo) {
       this.userInfo = { ...this.userInfo, ...userInfo }
       localStorage.setItem('userInfo', JSON.stringify(this.userInfo))
+    },
+
+    // 初始化用户状态（页面刷新时调用）
+    initializeAuth() {
+      const token = localStorage.getItem('token')
+      const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}')
+
+      if (token && userInfo.username) {
+        this.token = token
+        this.userInfo = userInfo
+
+        // 根据用户类型重新设置权限和角色
+        let permissions = []
+        let roles = []
+
+        switch (userInfo.userType) {
+          case USER_TYPES.ADMIN:
+            roles = [ROLES.ADMIN]
+            permissions = Object.values(PERMISSIONS) // 管理员拥有所有权限
+            break
+          case USER_TYPES.MANAGER:
+            roles = [ROLES.PROPERTY_MANAGER]
+            permissions = [
+              // 物业管理相关权限
+              PERMISSIONS.PROPERTY_BUILDING_VIEW,
+              PERMISSIONS.PROPERTY_BUILDING_ADD,
+              PERMISSIONS.PROPERTY_BUILDING_EDIT,
+              PERMISSIONS.PROPERTY_BUILDING_DELETE,
+              PERMISSIONS.PROPERTY_UNIT_VIEW,
+              PERMISSIONS.PROPERTY_UNIT_ADD,
+              PERMISSIONS.PROPERTY_UNIT_EDIT,
+              PERMISSIONS.PROPERTY_UNIT_DELETE,
+              PERMISSIONS.PROPERTY_HOUSE_VIEW,
+              PERMISSIONS.PROPERTY_HOUSE_ADD,
+              PERMISSIONS.PROPERTY_HOUSE_EDIT,
+              PERMISSIONS.PROPERTY_HOUSE_DELETE,
+              PERMISSIONS.PROPERTY_RESIDENT_VIEW,
+              PERMISSIONS.PROPERTY_RESIDENT_ADD,
+              PERMISSIONS.PROPERTY_RESIDENT_EDIT,
+              PERMISSIONS.PROPERTY_RESIDENT_DELETE,
+              PERMISSIONS.PROPERTY_FEE_TYPE_VIEW,
+              PERMISSIONS.PROPERTY_FEE_TYPE_ADD,
+              PERMISSIONS.PROPERTY_FEE_TYPE_EDIT,
+              PERMISSIONS.PROPERTY_FEE_TYPE_DELETE,
+              PERMISSIONS.PROPERTY_BILL_VIEW,
+              PERMISSIONS.PROPERTY_BILL_ADD,
+              PERMISSIONS.PROPERTY_BILL_EDIT,
+              PERMISSIONS.PROPERTY_BILL_DELETE,
+              PERMISSIONS.PROPERTY_BILL_GENERATE,
+              PERMISSIONS.PROPERTY_BILL_PAY,
+              PERMISSIONS.PROPERTY_WALLET_VIEW,
+              PERMISSIONS.PROPERTY_WALLET_RECHARGE,
+              PERMISSIONS.PROPERTY_WALLET_FREEZE,
+              PERMISSIONS.PROPERTY_WALLET_RESET_PASSWORD,
+              PERMISSIONS.PROPERTY_COMPLAINT_VIEW,
+              PERMISSIONS.PROPERTY_COMPLAINT_ADD,
+              PERMISSIONS.PROPERTY_COMPLAINT_EDIT,
+              PERMISSIONS.PROPERTY_COMPLAINT_DELETE,
+              PERMISSIONS.PROPERTY_COMPLAINT_ASSIGN,
+              PERMISSIONS.PROPERTY_COMPLAINT_HANDLE,
+              PERMISSIONS.PROPERTY_COMPLAINT_RATE,
+              PERMISSIONS.PROPERTY_REPAIR_VIEW,
+              PERMISSIONS.PROPERTY_REPAIR_ADD,
+              PERMISSIONS.PROPERTY_REPAIR_EDIT,
+              PERMISSIONS.PROPERTY_REPAIR_DELETE,
+              PERMISSIONS.PROPERTY_REPAIR_ASSIGN,
+              PERMISSIONS.PROPERTY_REPAIR_HANDLE,
+              PERMISSIONS.PROPERTY_REPAIR_ACCEPT,
+              PERMISSIONS.PROPERTY_PARKING_VIEW,
+              PERMISSIONS.PROPERTY_PARKING_ADD,
+              PERMISSIONS.PROPERTY_PARKING_EDIT,
+              PERMISSIONS.PROPERTY_PARKING_DELETE,
+              PERMISSIONS.PROPERTY_PARKING_RENT,
+              PERMISSIONS.PROPERTY_PARKING_AUDIT,
+              PERMISSIONS.PROPERTY_PARKING_RENEW,
+              PERMISSIONS.PROPERTY_PARKING_RETURN,
+              PERMISSIONS.PROPERTY_NOTICE_VIEW,
+              PERMISSIONS.PROPERTY_NOTICE_ADD,
+              PERMISSIONS.PROPERTY_NOTICE_EDIT,
+              PERMISSIONS.PROPERTY_NOTICE_DELETE,
+              PERMISSIONS.PROPERTY_NOTICE_PUBLISH,
+              PERMISSIONS.PROPERTY_NOTICE_WITHDRAW,
+              // 数据分析权限
+              PERMISSIONS.ANALYTICS_DASHBOARD_VIEW,
+              PERMISSIONS.ANALYTICS_DASHBOARD_EXPORT,
+              PERMISSIONS.ANALYTICS_REPORT_VIEW,
+              PERMISSIONS.ANALYTICS_REPORT_GENERATE,
+              PERMISSIONS.ANALYTICS_REPORT_DOWNLOAD,
+              PERMISSIONS.ANALYTICS_REPORT_SHARE,
+              PERMISSIONS.ANALYTICS_REPORT_DELETE,
+              PERMISSIONS.ANALYTICS_REPORT_TEMPLATE,
+              PERMISSIONS.ANALYTICS_REPORT_SCHEDULE,
+              // 消息通知权限
+              PERMISSIONS.NOTIFICATION_CENTER_VIEW,
+              PERMISSIONS.NOTIFICATION_CENTER_SEND,
+              PERMISSIONS.NOTIFICATION_CENTER_DELETE,
+              PERMISSIONS.NOTIFICATION_CENTER_BATCH,
+              PERMISSIONS.NOTIFICATION_TEMPLATE_VIEW,
+              PERMISSIONS.NOTIFICATION_TEMPLATE_ADD,
+              PERMISSIONS.NOTIFICATION_TEMPLATE_EDIT,
+              PERMISSIONS.NOTIFICATION_TEMPLATE_DELETE,
+              PERMISSIONS.NOTIFICATION_SETTINGS_VIEW,
+              PERMISSIONS.NOTIFICATION_SETTINGS_EDIT,
+              // 系统配置权限
+              PERMISSIONS.SYSTEM_CONFIG_VIEW,
+              PERMISSIONS.SYSTEM_CONFIG_EDIT,
+              PERMISSIONS.SYSTEM_CONFIG_BACKUP,
+              PERMISSIONS.SYSTEM_CONFIG_RESTORE
+            ]
+            break
+          case USER_TYPES.OWNER:
+            roles = [ROLES.OWNER]
+            permissions = [
+              // 业主门户权限
+              PERMISSIONS.PORTAL_VIEW,
+              PERMISSIONS.PORTAL_DASHBOARD_VIEW,
+              PERMISSIONS.PORTAL_BILL_VIEW,
+              PERMISSIONS.PORTAL_BILL_PAY,
+              PERMISSIONS.PORTAL_SERVICE_APPLY,
+              PERMISSIONS.PORTAL_PROFILE_VIEW,
+              PERMISSIONS.PORTAL_PROFILE_EDIT,
+              // 基础查看权限
+              PERMISSIONS.PROPERTY_NOTICE_VIEW,
+              PERMISSIONS.ANALYTICS_DASHBOARD_VIEW
+            ]
+            break
+          case USER_TYPES.WORKER:
+            roles = [ROLES.WORKER]
+            permissions = [
+              // 维修相关权限
+              PERMISSIONS.PROPERTY_REPAIR_VIEW,
+              PERMISSIONS.PROPERTY_REPAIR_HANDLE,
+              PERMISSIONS.PROPERTY_REPAIR_ACCEPT,
+              // 基础权限
+              PERMISSIONS.NOTIFICATION_CENTER_VIEW
+            ]
+            break
+        }
+
+        this.permissions = permissions
+        this.roles = roles
+      }
     }
   }
 })

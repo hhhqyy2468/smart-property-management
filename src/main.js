@@ -12,6 +12,9 @@ import './styles/main.scss'
 // 权限指令
 import { permission, role, userType } from './directives/permission'
 
+// 认证插件
+import authPlugin from './plugins/auth'
+
 const app = createApp(App)
 
 // 注册所有图标
@@ -29,5 +32,8 @@ app.use(router)
 app.use(ElementPlus, {
   locale: zhCn,
 })
+
+// 使用认证插件
+app.use(authPlugin)
 
 app.mount('#app')
