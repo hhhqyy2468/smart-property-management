@@ -23,21 +23,105 @@
           <template #title>首页</template>
         </el-menu-item>
 
-        <!-- 系统管理（暂时隐藏，等页面创建后再开启） -->
-        <!-- <el-sub-menu index="/system">
+        <!-- 系统管理 -->
+        <el-sub-menu index="/system" v-permission="{ permission: ['system:user:view', 'system:role:view', 'system:menu:view'], mode: 'any' }">
           <template #title>
             <el-icon><Setting /></el-icon>
             <span>系统管理</span>
           </template>
-          <el-menu-item index="/system/user">用户管理</el-menu-item>
+          <el-menu-item
+            index="/system/user"
+            v-permission="'system:user:view'"
+          >
+            用户管理
+          </el-menu-item>
+          <el-menu-item
+            index="/system/role"
+            v-permission="'system:role:view'"
+          >
+            角色管理
+          </el-menu-item>
+          <el-menu-item
+            index="/system/menu"
+            v-permission="'system:menu:view'"
+          >
+            菜单管理
+          </el-menu-item>
         </el-sub-menu>
 
-        <el-sub-menu index="/property">
+        <!-- 物业管理 -->
+        <el-sub-menu index="/property" v-permission="{ permission: ['property:building:view', 'property:house:view'], mode: 'any' }">
           <template #title>
             <el-icon><OfficeBuilding /></el-icon>
             <span>物业管理</span>
           </template>
-        </el-sub-menu> -->
+          <el-menu-item
+            index="/property/building"
+            v-permission="'property:building:view'"
+          >
+            楼栋管理
+          </el-menu-item>
+          <el-menu-item
+            index="/property/unit"
+            v-permission="'property:unit:view'"
+          >
+            单元管理
+          </el-menu-item>
+          <el-menu-item
+            index="/property/house"
+            v-permission="'property:house:view'"
+          >
+            房产管理
+          </el-menu-item>
+          <el-menu-item
+            index="/property/resident"
+            v-permission="'property:resident:view'"
+          >
+            住户管理
+          </el-menu-item>
+          <el-menu-item
+            index="/property/feetype"
+            v-permission="'property:feeType:view'"
+          >
+            费用类型
+          </el-menu-item>
+          <el-menu-item
+            index="/property/bill"
+            v-permission="'property:bill:view'"
+          >
+            账单管理
+          </el-menu-item>
+          <el-menu-item
+            index="/property/wallet"
+            v-permission="'property:wallet:view'"
+          >
+            钱包管理
+          </el-menu-item>
+          <el-menu-item
+            index="/property/complaint"
+            v-permission="'property:complaint:view'"
+          >
+            投诉管理
+          </el-menu-item>
+          <el-menu-item
+            index="/property/repair"
+            v-permission="'property:repair:view'"
+          >
+            维修管理
+          </el-menu-item>
+          <el-menu-item
+            index="/property/parking"
+            v-permission="'property:parking:view'"
+          >
+            停车管理
+          </el-menu-item>
+          <el-menu-item
+            index="/property/notice"
+            v-permission="'property:notice:view'"
+          >
+            公告管理
+          </el-menu-item>
+        </el-sub-menu>
       </el-menu>
     </div>
 
@@ -71,7 +155,12 @@
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item command="profile">个人中心</el-dropdown-item>
-                <el-dropdown-item command="portal">业主门户</el-dropdown-item>
+                <el-dropdown-item
+                  command="portal"
+                  v-permission="'portal:view'"
+                >
+                  业主门户
+                </el-dropdown-item>
                 <el-dropdown-item divided command="logout">退出登录</el-dropdown-item>
               </el-dropdown-menu>
             </template>
