@@ -47,6 +47,12 @@
           >
             菜单管理
           </el-menu-item>
+          <el-menu-item
+            index="/system/config"
+            v-permission="'system:config:view'"
+          >
+            系统配置
+          </el-menu-item>
         </el-sub-menu>
 
         <!-- 物业管理 -->
@@ -166,6 +172,32 @@
             报表管理
           </el-menu-item>
         </el-sub-menu>
+
+        <!-- 消息通知 -->
+        <el-sub-menu index="/notification" v-permission="{ permission: ['notification:center:view', 'notification:template:view'], mode: 'any' }">
+          <template #title>
+            <el-icon><Bell /></el-icon>
+            <span>消息通知</span>
+          </template>
+          <el-menu-item
+            index="/notification/center"
+            v-permission="'notification:center:view'"
+          >
+            消息中心
+          </el-menu-item>
+          <el-menu-item
+            index="/notification/template"
+            v-permission="'notification:template:view'"
+          >
+            消息模板
+          </el-menu-item>
+          <el-menu-item
+            index="/notification/settings"
+            v-permission="'notification:settings:view'"
+          >
+            通知设置
+          </el-menu-item>
+        </el-sub-menu>
       </el-menu>
     </div>
 
@@ -234,6 +266,7 @@ import {
   Tools,
   Van,
   TrendCharts,
+  Bell,
   Fold,
   Expand,
   ArrowDown

@@ -183,6 +183,11 @@ export const PERMISSIONS = {
   SYSTEM_MENU_EDIT: 'system:menu:edit',
   SYSTEM_MENU_DELETE: 'system:menu:delete',
 
+  SYSTEM_CONFIG_VIEW: 'system:config:view',
+  SYSTEM_CONFIG_EDIT: 'system:config:edit',
+  SYSTEM_CONFIG_BACKUP: 'system:config:backup',
+  SYSTEM_CONFIG_RESTORE: 'system:config:restore',
+
   // 物业管理
   PROPERTY_BUILDING_VIEW: 'property:building:view',
   PROPERTY_BUILDING_ADD: 'property:building:add',
@@ -271,7 +276,19 @@ export const PERMISSIONS = {
   PORTAL_BILL_PAY: 'portal:bill:pay',
   PORTAL_SERVICE_APPLY: 'portal:service:apply',
   PORTAL_PROFILE_VIEW: 'portal:profile:view',
-  PORTAL_PROFILE_EDIT: 'portal:profile:edit'
+  PORTAL_PROFILE_EDIT: 'portal:profile:edit',
+
+  // 消息通知
+  NOTIFICATION_CENTER_VIEW: 'notification:center:view',
+  NOTIFICATION_CENTER_SEND: 'notification:center:send',
+  NOTIFICATION_CENTER_DELETE: 'notification:center:delete',
+  NOTIFICATION_CENTER_BATCH: 'notification:center:batch',
+  NOTIFICATION_TEMPLATE_VIEW: 'notification:template:view',
+  NOTIFICATION_TEMPLATE_ADD: 'notification:template:add',
+  NOTIFICATION_TEMPLATE_EDIT: 'notification:template:edit',
+  NOTIFICATION_TEMPLATE_DELETE: 'notification:template:delete',
+  NOTIFICATION_SETTINGS_VIEW: 'notification:settings:view',
+  NOTIFICATION_SETTINGS_EDIT: 'notification:settings:edit'
 }
 
 /**

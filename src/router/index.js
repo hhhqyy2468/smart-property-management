@@ -45,6 +45,12 @@ const routes = [
         name: 'SystemMenu',
         component: () => import('@/views/system/menu/index.vue'),
         meta: { title: '菜单管理', icon: 'Document' }
+      },
+      {
+        path: 'config',
+        name: 'SystemConfig',
+        component: () => import('@/views/system/config/index.vue'),
+        meta: { title: '系统配置', icon: 'Tools' }
       }
     ]
   },
@@ -168,6 +174,33 @@ const routes = [
         name: 'AnalyticsReports',
         component: () => import('@/views/analytics/reports/index.vue'),
         meta: { title: '报表管理', icon: 'Document' }
+      }
+    ]
+  },
+  // 消息通知
+  {
+    path: '/notification',
+    name: 'Notification',
+    component: () => import('@/components/Layout/index.vue'),
+    meta: { title: '消息通知', icon: 'Bell' },
+    children: [
+      {
+        path: 'center',
+        name: 'NotificationCenter',
+        component: () => import('@/views/notification/center/index.vue'),
+        meta: { title: '消息中心', icon: 'Bell' }
+      },
+      {
+        path: 'template',
+        name: 'NotificationTemplate',
+        component: () => import('@/views/notification/template/index.vue'),
+        meta: { title: '消息模板', icon: 'Document' }
+      },
+      {
+        path: 'settings',
+        name: 'NotificationSettings',
+        component: () => import('@/views/notification/settings/index.vue'),
+        meta: { title: '通知设置', icon: 'Setting' }
       }
     ]
   },
