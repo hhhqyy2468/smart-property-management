@@ -251,7 +251,27 @@ export const PERMISSIONS = {
   PROPERTY_NOTICE_EDIT: 'property:notice:edit',
   PROPERTY_NOTICE_DELETE: 'property:notice:delete',
   PROPERTY_NOTICE_PUBLISH: 'property:notice:publish',
-  PROPERTY_NOTICE_WITHDRAW: 'property:notice:withdraw'
+  PROPERTY_NOTICE_WITHDRAW: 'property:notice:withdraw',
+
+  // 数据分析
+  ANALYTICS_DASHBOARD_VIEW: 'analytics:dashboard:view',
+  ANALYTICS_DASHBOARD_EXPORT: 'analytics:dashboard:export',
+  ANALYTICS_REPORT_VIEW: 'analytics:report:view',
+  ANALYTICS_REPORT_GENERATE: 'analytics:report:generate',
+  ANALYTICS_REPORT_DOWNLOAD: 'analytics:report:download',
+  ANALYTICS_REPORT_SHARE: 'analytics:report:share',
+  ANALYTICS_REPORT_DELETE: 'analytics:report:delete',
+  ANALYTICS_REPORT_TEMPLATE: 'analytics:report:template',
+  ANALYTICS_REPORT_SCHEDULE: 'analytics:report:schedule',
+
+  // 业主门户
+  PORTAL_VIEW: 'portal:view',
+  PORTAL_DASHBOARD_VIEW: 'portal:dashboard:view',
+  PORTAL_BILL_VIEW: 'portal:bill:view',
+  PORTAL_BILL_PAY: 'portal:bill:pay',
+  PORTAL_SERVICE_APPLY: 'portal:service:apply',
+  PORTAL_PROFILE_VIEW: 'portal:profile:view',
+  PORTAL_PROFILE_EDIT: 'portal:profile:edit'
 }
 
 /**

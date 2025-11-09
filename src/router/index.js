@@ -150,6 +150,48 @@ const routes = [
       }
     ]
   },
+  // 数据分析
+  {
+    path: '/analytics',
+    name: 'Analytics',
+    component: () => import('@/components/Layout/index.vue'),
+    meta: { title: '数据分析', icon: 'TrendCharts' },
+    children: [
+      {
+        path: 'dashboard',
+        name: 'AnalyticsDashboard',
+        component: () => import('@/views/analytics/dashboard/index.vue'),
+        meta: { title: '数据大屏', icon: 'Monitor' }
+      },
+      {
+        path: 'reports',
+        name: 'AnalyticsReports',
+        component: () => import('@/views/analytics/reports/index.vue'),
+        meta: { title: '报表管理', icon: 'Document' }
+      }
+    ]
+  },
+  // 业主门户
+  {
+    path: '/portal',
+    name: 'Portal',
+    component: () => import('@/components/Layout/index.vue'),
+    meta: { title: '业主门户', icon: 'House' },
+    children: [
+      {
+        path: 'dashboard',
+        name: 'PortalDashboard',
+        component: () => import('@/views/portal/dashboard/index.vue'),
+        meta: { title: '业主首页', icon: 'House' }
+      },
+      {
+        path: 'bills',
+        name: 'PortalBills',
+        component: () => import('@/views/portal/bills/index.vue'),
+        meta: { title: '账单管理', icon: 'Money' }
+      }
+    ]
+  },
   // 404页面
   {
     path: '/:pathMatch(.*)*',

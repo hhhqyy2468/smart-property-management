@@ -146,6 +146,26 @@
             公告管理
           </el-menu-item>
         </el-sub-menu>
+
+        <!-- 数据分析 -->
+        <el-sub-menu index="/analytics" v-permission="{ permission: ['analytics:dashboard:view', 'analytics:report:view'], mode: 'any' }">
+          <template #title>
+            <el-icon><TrendCharts /></el-icon>
+            <span>数据分析</span>
+          </template>
+          <el-menu-item
+            index="/analytics/dashboard"
+            v-permission="'analytics:dashboard:view'"
+          >
+            数据大屏
+          </el-menu-item>
+          <el-menu-item
+            index="/analytics/reports"
+            v-permission="'analytics:report:view'"
+          >
+            报表管理
+          </el-menu-item>
+        </el-sub-menu>
       </el-menu>
     </div>
 
@@ -213,6 +233,7 @@ import {
   Money,
   Tools,
   Van,
+  TrendCharts,
   Fold,
   Expand,
   ArrowDown
