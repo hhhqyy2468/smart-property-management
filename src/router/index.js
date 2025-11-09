@@ -51,8 +51,14 @@ const routes = [
         name: 'SystemConfig',
         component: () => import('@/views/system/config/index.vue'),
         meta: { title: '系统配置', icon: 'Tools' }
-      }
-    ]
+      },
+      {
+        path: 'dict',
+        name: 'SystemDict',
+        component: () => import('@/views/system/dict/index.vue'),
+        meta: { title: '字典管理', icon: 'Document' }
+      },
+      ]
   },
   // 物业管理
   {
@@ -79,11 +85,11 @@ const routes = [
         component: () => import('@/views/property/house/index.vue'),
         meta: { title: '房产管理', icon: 'OfficeBuilding' }
       },
-      {
-        path: 'resident',
-        name: 'PropertyResident',
-        component: () => import('@/views/property/resident/index.vue'),
-        meta: { title: '住户管理', icon: 'OfficeBuilding' }
+          {
+        path: 'owner',
+        name: 'PropertyOwner',
+        component: () => import('@/views/property/owner/index.vue'),
+        meta: { title: '业主管理', icon: 'User' }
       }
     ]
   },
@@ -135,81 +141,69 @@ const routes = [
       }
     ]
   },
-  // 资源管理
+    // 停车管理
   {
-    path: '/resource',
-    name: 'Resource',
+    path: '/parking',
+    name: 'Parking',
     component: () => import('@/components/Layout/index.vue'),
-    meta: { title: '资源管理', icon: 'Van' },
+    meta: { title: '停车管理', icon: 'Van' },
     children: [
       {
-        path: 'parking',
-        name: 'ResourceParking',
+        path: 'space',
+        name: 'ParkingSpace',
         component: () => import('@/views/property/parking/index.vue'),
-        meta: { title: '停车管理', icon: 'Van' }
+        meta: { title: '车位管理', icon: 'Van' }
       },
       {
-        path: 'notice',
-        name: 'ResourceNotice',
+        path: 'rental',
+        name: 'ParkingRental',
+        component: () => import('@/views/property/parking/index.vue'),
+        meta: { title: '租赁管理', icon: 'Van' }
+      }
+    ]
+  },
+  // 公告管理
+  {
+    path: '/notice',
+    name: 'Notice',
+    component: () => import('@/components/Layout/index.vue'),
+    meta: { title: '公告管理', icon: 'Bell' },
+    children: [
+      {
+        path: 'publish',
+        name: 'NoticePublish',
         component: () => import('@/views/property/notice/index.vue'),
-        meta: { title: '公告管理', icon: 'Bell' }
+        meta: { title: '公告发布', icon: 'Bell' }
       }
     ]
   },
-  // 数据分析
+  // 系统日志
   {
-    path: '/analytics',
-    name: 'Analytics',
+    path: '/log',
+    name: 'Log',
     component: () => import('@/components/Layout/index.vue'),
-    meta: { title: '数据分析', icon: 'TrendCharts' },
+    meta: { title: '系统日志', icon: 'View' },
     children: [
       {
-        path: 'dashboard',
-        name: 'AnalyticsDashboard',
-        component: () => import('@/views/analytics/dashboard/index.vue'),
-        meta: { title: '数据大屏', icon: 'Monitor' }
+        path: 'operation',
+        name: 'LogOperation',
+        component: () => import('@/views/system/log/index.vue'),
+        meta: { title: '操作日志', icon: 'View' }
       },
       {
-        path: 'reports',
-        name: 'AnalyticsReports',
-        component: () => import('@/views/analytics/reports/index.vue'),
-        meta: { title: '报表管理', icon: 'Document' }
+        path: 'login',
+        name: 'LogLogin',
+        component: () => import('@/views/system/log/index.vue'),
+        meta: { title: '登录日志', icon: 'View' }
       }
     ]
   },
-  // 消息通知
-  {
-    path: '/notification',
-    name: 'Notification',
-    component: () => import('@/components/Layout/index.vue'),
-    meta: { title: '消息通知', icon: 'Bell' },
-    children: [
-      {
-        path: 'center',
-        name: 'NotificationCenter',
-        component: () => import('@/views/notification/center/index.vue'),
-        meta: { title: '消息中心', icon: 'Bell' }
-      },
-      {
-        path: 'template',
-        name: 'NotificationTemplate',
-        component: () => import('@/views/notification/template/index.vue'),
-        meta: { title: '消息模板', icon: 'Document' }
-      },
-      {
-        path: 'settings',
-        name: 'NotificationSettings',
-        component: () => import('@/views/notification/settings/index.vue'),
-        meta: { title: '通知设置', icon: 'Setting' }
-      }
-    ]
-  },
-  // 业主门户
+  // 业主门户（重构）
   {
     path: '/portal',
     name: 'Portal',
     component: () => import('@/components/Layout/index.vue'),
-    meta: { title: '业主门户', icon: 'House' },
+    meta: { title: '业主门户', icon: 'User' },
     children: [
       {
         path: 'dashboard',
@@ -221,7 +215,106 @@ const routes = [
         path: 'bills',
         name: 'PortalBills',
         component: () => import('@/views/portal/bills/index.vue'),
-        meta: { title: '账单管理', icon: 'Money' }
+        meta: { title: '我的账单', icon: 'Money' }
+      },
+      {
+        path: 'wallet',
+        name: 'PortalWallet',
+        component: () => import('@/views/property/wallet/index.vue'),
+        meta: { title: '我的钱包', icon: 'Money' }
+      },
+      {
+        path: 'house',
+        name: 'PortalHouse',
+        component: () => import('@/views/property/house/index.vue'),
+        meta: { title: '我的房产', icon: 'OfficeBuilding' }
+      },
+      {
+        path: 'parking',
+        name: 'PortalParking',
+        component: () => import('@/views/property/parking/index.vue'),
+        meta: { title: '我的车位', icon: 'Van' }
+      },
+      {
+        path: 'complaint',
+        name: 'PortalComplaint',
+        component: () => import('@/views/property/complaint/index.vue'),
+        meta: { title: '我的投诉', icon: 'Message' }
+      },
+      {
+        path: 'repair',
+        name: 'PortalRepair',
+        component: () => import('@/views/property/repair/index.vue'),
+        meta: { title: '我的报修', icon: 'Tools' }
+      },
+      {
+        path: 'announcement',
+        name: 'PortalAnnouncement',
+        component: () => import('@/views/property/notice/index.vue'),
+        meta: { title: '社区公告', icon: 'Bell' }
+      }
+    ]
+  },
+  // 我的工作（维修人员）
+  {
+    path: '/work',
+    name: 'Work',
+    component: () => import('@/components/Layout/index.vue'),
+    meta: { title: '我的工作', icon: 'Tools' },
+    children: [
+      {
+        path: 'pending',
+        name: 'WorkPending',
+        component: () => import('@/views/property/repair/index.vue'),
+        meta: { title: '待接单', icon: 'Tools' }
+      },
+      {
+        path: 'processing',
+        name: 'WorkProcessing',
+        component: () => import('@/views/property/repair/index.vue'),
+        meta: { title: '进行中', icon: 'Tools' }
+      },
+      {
+        path: 'pending-accept',
+        name: 'WorkPendingAccept',
+        component: () => import('@/views/property/repair/index.vue'),
+        meta: { title: '待验收', icon: 'Tools' }
+      },
+      {
+        path: 'completed',
+        name: 'WorkCompleted',
+        component: () => import('@/views/property/repair/index.vue'),
+        meta: { title: '已完成', icon: 'Tools' }
+      }
+    ]
+  },
+  // 社区公告（维修人员）
+  {
+    path: '/community-notice',
+    name: 'CommunityNotice',
+    component: () => import('@/components/Layout/index.vue'),
+    meta: { title: '社区公告', icon: 'Bell' },
+    children: [
+      {
+        path: 'view',
+        name: 'CommunityNoticeView',
+        component: () => import('@/views/property/notice/index.vue'),
+        meta: { title: '公告查看', icon: 'Bell' }
+      }
+    ]
+  },
+  // 个人中心
+  {
+    path: '/profile',
+    name: 'Profile',
+    component: () => import('@/components/Layout/index.vue'),
+    meta: { title: '个人中心', icon: 'User', hideInMenu: true },
+    children: [
+      {
+        path: 'index',
+        name: 'ProfileIndex',
+        component: () => import('@/views/profile/index.vue'),
+        meta: { title: '个人中心', icon: 'User', hideInMenu: true }
       }
     ]
   },

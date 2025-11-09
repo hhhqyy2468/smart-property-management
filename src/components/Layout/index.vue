@@ -18,184 +18,190 @@
         active-text-color="#409eff"
         router
       >
-        <el-menu-item index="/dashboard">
+        <el-menu-item index="/dashboard" v-user-type="[1, 2, 4]">
           <el-icon><House /></el-icon>
-          <template #title>首页</template>
+          <template #title>工作台</template>
         </el-menu-item>
 
-        <!-- 系统管理 -->
-        <el-sub-menu index="/system" v-permission="{ permission: ['system:user:view', 'system:role:view', 'system:menu:view'], mode: 'any' }">
+        <!-- 系统管理 - 仅系统管理员可见 -->
+        <el-sub-menu index="/system" v-user-type="1">
           <template #title>
             <el-icon><Setting /></el-icon>
             <span>系统管理</span>
           </template>
-          <el-menu-item
-            index="/system/user"
-            v-permission="'system:user:view'"
-          >
+          <el-menu-item index="/system/user">
             用户管理
           </el-menu-item>
-          <el-menu-item
-            index="/system/role"
-            v-permission="'system:role:view'"
-          >
+          <el-menu-item index="/system/role">
             角色管理
           </el-menu-item>
-          <el-menu-item
-            index="/system/menu"
-            v-permission="'system:menu:view'"
-          >
+          <el-menu-item index="/system/menu">
             菜单管理
           </el-menu-item>
-          <el-menu-item
-            index="/system/config"
-            v-permission="'system:config:view'"
-          >
-            系统配置
+          <el-menu-item index="/system/dict">
+            字典管理
           </el-menu-item>
         </el-sub-menu>
 
-        <!-- 物业管理 -->
-        <el-sub-menu index="/property" v-permission="{ permission: ['property:building:view', 'property:house:view'], mode: 'any' }">
+        <!-- 物业管理 - 系统管理员和物业管理员可见 -->
+        <el-sub-menu index="/property" v-user-type="[1, 2]">
           <template #title>
             <el-icon><OfficeBuilding /></el-icon>
             <span>物业管理</span>
           </template>
-          <el-menu-item
-            index="/property/building"
-            v-permission="'property:building:view'"
-          >
+          <el-menu-item index="/property/building">
             楼栋管理
           </el-menu-item>
-          <el-menu-item
-            index="/property/unit"
-            v-permission="'property:unit:view'"
-          >
+          <el-menu-item index="/property/unit">
             单元管理
           </el-menu-item>
-          <el-menu-item
-            index="/property/house"
-            v-permission="'property:house:view'"
-          >
+          <el-menu-item index="/property/house">
             房产管理
           </el-menu-item>
-          <el-menu-item
-            index="/property/resident"
-            v-permission="'property:resident:view'"
-          >
-            住户管理
+          <el-menu-item index="/property/owner">
+            业主管理
           </el-menu-item>
         </el-sub-menu>
 
-        <!-- 财务管理 -->
-        <el-sub-menu index="/finance" v-permission="{ permission: ['finance:feeType:view', 'finance:bill:view', 'finance:wallet:view'], mode: 'any' }">
+        <!-- 费用管理 - 系统管理员和物业管理员可见 -->
+        <el-sub-menu index="/finance" v-user-type="[1, 2]">
           <template #title>
             <el-icon><Money /></el-icon>
-            <span>财务管理</span>
+            <span>费用管理</span>
           </template>
-          <el-menu-item
-            index="/finance/feetype"
-            v-permission="'finance:feeType:view'"
-          >
-            费用类型
+          <el-menu-item index="/finance/feetype">
+            费用类型管理
           </el-menu-item>
-          <el-menu-item
-            index="/finance/bill"
-            v-permission="'finance:bill:view'"
-          >
+          <el-menu-item index="/finance/bill">
             账单管理
           </el-menu-item>
-          <el-menu-item
-            index="/finance/wallet"
-            v-permission="'finance:wallet:view'"
-          >
-            钱包管理
+          <el-menu-item index="/finance/wallet">
+            虚拟钱包管理
           </el-menu-item>
         </el-sub-menu>
 
-        <!-- 服务管理 -->
-        <el-sub-menu index="/service" v-permission="{ permission: ['service:complaint:view', 'service:repair:view'], mode: 'any' }">
+        <!-- 服务管理 - 系统管理员和物业管理员可见 -->
+        <el-sub-menu index="/service" v-user-type="[1, 2]">
           <template #title>
             <el-icon><Tools /></el-icon>
             <span>服务管理</span>
           </template>
-          <el-menu-item
-            index="/service/complaint"
-            v-permission="'service:complaint:view'"
-          >
+          <el-menu-item index="/service/complaint">
             投诉管理
           </el-menu-item>
-          <el-menu-item
-            index="/service/repair"
-            v-permission="'service:repair:view'"
-          >
+          <el-menu-item index="/service/repair">
             维修管理
           </el-menu-item>
         </el-sub-menu>
 
-        <!-- 资源管理 -->
-        <el-sub-menu index="/resource" v-permission="{ permission: ['property:parking:view', 'property:notice:view'], mode: 'any' }">
+        <!-- 停车管理 - 系统管理员和物业管理员可见 -->
+        <el-sub-menu index="/parking" v-user-type="[1, 2]">
           <template #title>
             <el-icon><Van /></el-icon>
-            <span>资源管理</span>
+            <span>停车管理</span>
           </template>
-          <el-menu-item
-            index="/resource/parking"
-            v-permission="'property:parking:view'"
-          >
-            停车管理
+          <el-menu-item index="/parking/space">
+            车位管理
           </el-menu-item>
-          <el-menu-item
-            index="/resource/notice"
-            v-permission="'property:notice:view'"
-          >
-            公告管理
+          <el-menu-item index="/parking/rental">
+            租赁管理
           </el-menu-item>
         </el-sub-menu>
 
-        <!-- 数据分析 -->
-        <el-sub-menu index="/analytics" v-permission="{ permission: ['analytics:dashboard:view', 'analytics:report:view'], mode: 'any' }">
-          <template #title>
-            <el-icon><TrendCharts /></el-icon>
-            <span>数据分析</span>
-          </template>
-          <el-menu-item
-            index="/analytics/dashboard"
-            v-permission="'analytics:dashboard:view'"
-          >
-            数据大屏
-          </el-menu-item>
-          <el-menu-item
-            index="/analytics/reports"
-            v-permission="'analytics:report:view'"
-          >
-            报表管理
-          </el-menu-item>
-        </el-sub-menu>
-
-        <!-- 消息通知 -->
-        <el-sub-menu index="/notification" v-permission="{ permission: ['notification:center:view', 'notification:template:view'], mode: 'any' }">
+        <!-- 公告管理 - 系统管理员和物业管理员可见 -->
+        <el-sub-menu index="/notice" v-user-type="[1, 2]">
           <template #title>
             <el-icon><Bell /></el-icon>
-            <span>消息通知</span>
+            <span>公告管理</span>
           </template>
-          <el-menu-item
-            index="/notification/center"
-            v-permission="'notification:center:view'"
-          >
-            消息中心
+          <el-menu-item index="/notice/publish">
+            公告发布
           </el-menu-item>
-          <el-menu-item
-            index="/notification/template"
-            v-permission="'notification:template:view'"
-          >
-            消息模板
+        </el-sub-menu>
+
+        <!-- 系统日志 - 仅系统管理员可见 -->
+        <el-sub-menu index="/log" v-user-type="1">
+          <template #title>
+            <el-icon><View /></el-icon>
+            <span>系统日志</span>
+          </template>
+          <el-menu-item index="/log/operation">
+            操作日志
           </el-menu-item>
-          <el-menu-item
-            index="/notification/settings"
-            v-permission="'notification:settings:view'"
-          >
-            通知设置
+          <el-menu-item index="/log/login">
+            登录日志
+          </el-menu-item>
+        </el-sub-menu>
+
+        <!-- 业主门户菜单 - 仅业主可见 -->
+        <el-menu-item index="/portal/dashboard" v-user-type="3">
+          <el-icon><House /></el-icon>
+          <template #title>首页</template>
+        </el-menu-item>
+
+        <el-menu-item index="/portal/bills" v-user-type="3">
+          <el-icon><Money /></el-icon>
+          <template #title>我的账单</template>
+        </el-menu-item>
+
+        <el-menu-item index="/portal/wallet" v-user-type="3">
+          <el-icon><CreditCard /></el-icon>
+          <template #title>我的钱包</template>
+        </el-menu-item>
+
+        <el-menu-item index="/portal/house" v-user-type="3">
+          <el-icon><OfficeBuilding /></el-icon>
+          <template #title>我的房产</template>
+        </el-menu-item>
+
+        <el-menu-item index="/portal/parking" v-user-type="3">
+          <el-icon><Van /></el-icon>
+          <template #title>我的车位</template>
+        </el-menu-item>
+
+        <el-menu-item index="/portal/complaint" v-user-type="3">
+          <el-icon><ChatDotRound /></el-icon>
+          <template #title>我的投诉</template>
+        </el-menu-item>
+
+        <el-menu-item index="/portal/repair" v-user-type="3">
+          <el-icon><Tools /></el-icon>
+          <template #title>我的报修</template>
+        </el-menu-item>
+
+        <el-menu-item index="/portal/announcement" v-user-type="3">
+          <el-icon><Bell /></el-icon>
+          <template #title>社区公告</template>
+        </el-menu-item>
+
+        <!-- 我的工作 - 仅维修人员可见 -->
+        <el-sub-menu index="/work" v-user-type="4">
+          <template #title>
+            <el-icon><Tools /></el-icon>
+            <span>我的工作</span>
+          </template>
+          <el-menu-item index="/work/pending">
+            待接单
+          </el-menu-item>
+          <el-menu-item index="/work/processing">
+            进行中
+          </el-menu-item>
+          <el-menu-item index="/work/pending-accept">
+            待验收
+          </el-menu-item>
+          <el-menu-item index="/work/completed">
+            已完成
+          </el-menu-item>
+        </el-sub-menu>
+
+        <!-- 社区公告 - 维修人员可见 -->
+        <el-sub-menu index="/community-notice" v-user-type="4">
+          <template #title>
+            <el-icon><Bell /></el-icon>
+            <span>社区公告</span>
+          </template>
+          <el-menu-item index="/community-notice/view">
+            公告查看
           </el-menu-item>
         </el-sub-menu>
       </el-menu>
@@ -231,12 +237,6 @@
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item command="profile">个人中心</el-dropdown-item>
-                <el-dropdown-item
-                  command="portal"
-                  v-permission="'portal:view'"
-                >
-                  业主门户
-                </el-dropdown-item>
                 <el-dropdown-item divided command="logout">退出登录</el-dropdown-item>
               </el-dropdown-menu>
             </template>
@@ -265,11 +265,14 @@ import {
   Money,
   Tools,
   Van,
-  TrendCharts,
   Bell,
+  User,
+  View,
   Fold,
   Expand,
-  ArrowDown
+  ArrowDown,
+  CreditCard,
+  ChatDotRound
 } from '@element-plus/icons-vue'
 
 const route = useRoute()
@@ -288,10 +291,7 @@ const toggleSidebar = () => {
 const handleCommand = async (command) => {
   switch (command) {
     case 'profile':
-      // 跳转到个人中心
-      break
-    case 'portal':
-      router.push('/portal/index')
+      router.push('/profile/index')
       break
     case 'logout':
       try {

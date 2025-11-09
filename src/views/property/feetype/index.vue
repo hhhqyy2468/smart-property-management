@@ -8,19 +8,19 @@
         inline
         class="search-form"
       >
-        <el-form-item label="类型名称" prop="typeName">
+        <el-form-item label="费用名称" prop="feeName">
           <el-input
-            v-model="searchForm.typeName"
-            placeholder="请输入类型名称"
+            v-model="searchForm.feeName"
+            placeholder="请输入费用名称"
             clearable
             style="width: 200px"
           />
         </el-form-item>
 
-        <el-form-item label="类型编码" prop="typeCode">
+        <el-form-item label="费用编码" prop="feeCode">
           <el-input
-            v-model="searchForm.typeCode"
-            placeholder="请输入类型编码"
+            v-model="searchForm.feeCode"
+            placeholder="请输入费用编码"
             clearable
             style="width: 200px"
           />
@@ -190,8 +190,8 @@ const isEdit = ref(false)
 
 // 搜索表单
 const searchForm = reactive({
-  typeName: '',
-  typeCode: '',
+  feeName: '',
+  feeCode: '',
   status: ''
 })
 
@@ -212,14 +212,14 @@ const tableColumns = [
     width: '55'
   },
   {
-    prop: 'typeName',
-    label: '类型名称',
+    prop: 'feeName',
+    label: '费用名称',
     width: '150',
     sortable: true
   },
   {
-    prop: 'typeCode',
-    label: '类型编码',
+    prop: 'feeCode',
+    label: '费用编码',
     width: '120'
   },
   {
@@ -230,7 +230,7 @@ const tableColumns = [
     sortable: true
   },
   {
-    prop: 'billingUnit',
+    prop: 'unitType',
     label: '计费单位',
     width: '120'
   },
@@ -275,7 +275,7 @@ const billingCycleOptions = [
 ]
 
 // 计费单位选项
-const billingUnitOptions = [
+const unitTypeOptions = [
   { label: '元/平方米', value: '元/平方米' },
   { label: '元/套', value: '元/套' },
   { label: '元/月', value: '元/月' },
@@ -287,11 +287,11 @@ const billingUnitOptions = [
 
 // 表单数据
 const form = reactive({
-  typeId: null,
-  typeName: '',
-  typeCode: '',
+  feeTypeId: null,
+  feeName: '',
+  feeCode: '',
   unitPrice: 0,
-  billingUnit: '',
+  unitType: '',
   billingCycle: 1,
   description: '',
   status: 1
@@ -299,19 +299,19 @@ const form = reactive({
 
 // 表单规则
 const formRules = {
-  typeName: [
-    { required: true, message: '请输入类型名称', trigger: 'blur' },
-    { min: 2, max: 50, message: '类型名称长度在2到50个字符', trigger: 'blur' }
+  feeName: [
+    { required: true, message: '请输入费用名称', trigger: 'blur' },
+    { min: 2, max: 50, message: '费用名称长度在2到50个字符', trigger: 'blur' }
   ],
-  typeCode: [
-    { required: true, message: '请输入类型编码', trigger: 'blur' },
-    { pattern: /^[A-Z_][A-Z0-9_]*$/, message: '类型编码只能包含大写字母、数字和下划线', trigger: 'blur' }
+  feeCode: [
+    { required: true, message: '请输入费用编码', trigger: 'blur' },
+    { pattern: /^[A-Z_][A-Z0-9_]*$/, message: '费用编码只能包含大写字母、数字和下划线', trigger: 'blur' }
   ],
   unitPrice: [
     { required: true, message: '请输入单价', trigger: 'blur' },
     { type: 'number', min: 0, message: '单价必须大于等于0', trigger: 'blur' }
   ],
-  billingUnit: [
+  unitType: [
     { required: true, message: '请选择计费单位', trigger: 'change' }
   ],
   billingCycle: [
@@ -322,16 +322,16 @@ const formRules = {
 // 表单项配置
 const formItems = computed(() => [
   {
-    prop: 'typeName',
-    label: '类型名称',
+    prop: 'feeName',
+    label: '费用名称',
     type: 'input',
-    placeholder: '请输入类型名称'
+    placeholder: '请输入费用名称'
   },
   {
-    prop: 'typeCode',
-    label: '类型编码',
+    prop: 'feeCode',
+    label: '费用编码',
     type: 'input',
-    placeholder: '请输入类型编码（如：PROPERTY_FEE）',
+    placeholder: '请输入费用编码（如：PROPERTY_FEE）',
     disabled: isEdit.value
   },
   {
@@ -343,10 +343,10 @@ const formItems = computed(() => [
     prepend: '¥'
   },
   {
-    prop: 'billingUnit',
+    prop: 'unitType',
     label: '计费单位',
     type: 'select',
-    options: billingUnitOptions,
+    options: unitTypeOptions,
     placeholder: '请选择计费单位'
   },
   {
@@ -397,88 +397,88 @@ const getBillingCycleTag = (cycle) => {
 const getMockData = () => {
   const mockFeeTypes = [
     {
-      typeId: 1,
-      typeName: '物业费',
-      typeCode: 'PROPERTY_FEE',
+      feeTypeId: 1,
+      feeName: '物业费',
+      feeCode: 'PROPERTY_FEE',
       unitPrice: 2.5,
-      billingUnit: '元/平方米',
+      unitType: '元/平方米',
       billingCycle: 1,
       description: '小区日常维护、保洁、安保等费用',
       status: 1,
       createTime: '2024-01-01 10:00:00'
     },
     {
-      typeId: 2,
-      typeName: '停车费',
-      typeCode: 'PARKING_FEE',
+      feeTypeId: 2,
+      feeName: '停车费',
+      feeCode: 'PARKING_FEE',
       unitPrice: 200,
-      billingUnit: '元/月',
+      unitType: '元/月',
       billingCycle: 1,
       description: '地下/地面停车位使用费',
       status: 1,
       createTime: '2024-01-01 10:00:00'
     },
     {
-      typeId: 3,
-      typeName: '垃圾处理费',
-      typeCode: 'GARBAGE_FEE',
+      feeTypeId: 3,
+      feeName: '垃圾处理费',
+      feeCode: 'GARBAGE_FEE',
       unitPrice: 10,
-      billingUnit: '元/户',
+      unitType: '元/户',
       billingCycle: 1,
       description: '生活垃圾收集和处理费用',
       status: 1,
       createTime: '2024-01-01 10:00:00'
     },
     {
-      typeId: 4,
-      typeName: '电梯费',
-      typeCode: 'ELEVATOR_FEE',
+      feeTypeId: 4,
+      feeName: '电梯费',
+      feeCode: 'ELEVATOR_FEE',
       unitPrice: 30,
-      billingUnit: '元/户',
+      unitType: '元/户',
       billingCycle: 1,
       description: '电梯运行、维护、年检等费用',
       status: 1,
       createTime: '2024-01-01 10:00:00'
     },
     {
-      typeId: 5,
-      typeName: '公共照明费',
-      typeCode: 'PUBLIC_LIGHTING_FEE',
+      feeTypeId: 5,
+      feeName: '公共照明费',
+      feeCode: 'PUBLIC_LIGHTING_FEE',
       unitPrice: 15,
-      billingUnit: '元/户',
+      unitType: '元/户',
       billingCycle: 1,
       description: '楼道、公共区域照明电费',
       status: 1,
       createTime: '2024-01-01 10:00:00'
     },
     {
-      typeId: 6,
-      typeName: '水费',
-      typeCode: 'WATER_FEE',
+      feeTypeId: 6,
+      feeName: '水费',
+      feeCode: 'WATER_FEE',
       unitPrice: 4.5,
-      billingUnit: '元/吨',
+      unitType: '元/吨',
       billingCycle: 1,
       description: '公共区域用水费用',
       status: 1,
       createTime: '2024-01-01 10:00:00'
     },
     {
-      typeId: 7,
-      typeName: '电费',
-      typeCode: 'ELECTRICITY_FEE',
+      feeTypeId: 7,
+      feeName: '电费',
+      feeCode: 'ELECTRICITY_FEE',
       unitPrice: 0.8,
-      billingUnit: '元/度',
+      unitType: '元/度',
       billingCycle: 1,
       description: '公共区域用电费用',
       status: 1,
       createTime: '2024-01-01 10:00:00'
     },
     {
-      typeId: 8,
-      typeName: '维修基金',
-      typeCode: 'MAINTENANCE_FUND',
+      feeTypeId: 8,
+      feeName: '维修基金',
+      feeCode: 'MAINTENANCE_FUND',
       unitPrice: 1000,
-      billingUnit: '元/年',
+      unitType: '元/年',
       billingCycle: 3,
       description: '房屋公共部位、设施设备维修基金',
       status: 1,

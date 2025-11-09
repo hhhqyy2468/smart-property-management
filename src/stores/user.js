@@ -172,21 +172,70 @@ export const useUserStore = defineStore('user', {
                 PERMISSIONS.PROPERTY_NOTICE_ADD,
                 PERMISSIONS.PROPERTY_NOTICE_EDIT,
                 PERMISSIONS.PROPERTY_NOTICE_DELETE,
-                PERMISSIONS.PROPERTY_NOTICE_PUBLISH
+                PERMISSIONS.PROPERTY_NOTICE_PUBLISH,
+                // 数据分析权限
+                PERMISSIONS.ANALYTICS_DASHBOARD_VIEW,
+                PERMISSIONS.ANALYTICS_REPORT_VIEW,
+                PERMISSIONS.ANALYTICS_REPORT_GENERATE,
+                // 消息通知权限
+                PERMISSIONS.NOTIFICATION_CENTER_VIEW,
+                PERMISSIONS.NOTIFICATION_CENTER_SEND,
+                PERMISSIONS.NOTIFICATION_TEMPLATE_VIEW,
+                PERMISSIONS.NOTIFICATION_TEMPLATE_ADD,
+                PERMISSIONS.NOTIFICATION_TEMPLATE_EDIT,
+                PERMISSIONS.NOTIFICATION_TEMPLATE_DELETE,
+                PERMISSIONS.NOTIFICATION_SETTINGS_VIEW,
+                PERMISSIONS.NOTIFICATION_SETTINGS_EDIT,
+                // 业主门户查看权限（管理员可以查看业主门户）
+                PERMISSIONS.PORTAL_VIEW,
+                PERMISSIONS.PORTAL_DASHBOARD_VIEW,
+                PERMISSIONS.PORTAL_BILL_VIEW,
+                // 系统配置权限
+                PERMISSIONS.SYSTEM_CONFIG_VIEW,
+                PERMISSIONS.SYSTEM_CONFIG_EDIT,
+                PERMISSIONS.SYSTEM_CONFIG_BACKUP,
+                PERMISSIONS.SYSTEM_CONFIG_RESTORE,
+                // 字典管理权限
+                PERMISSIONS.SYSTEM_DICT_VIEW,
+                PERMISSIONS.SYSTEM_DICT_ADD,
+                PERMISSIONS.SYSTEM_DICT_EDIT,
+                PERMISSIONS.SYSTEM_DICT_DELETE,
+                PERMISSIONS.SYSTEM_DICT_REFRESH,
+                // 系统日志权限
+                PERMISSIONS.SYSTEM_LOG_VIEW,
+                PERMISSIONS.SYSTEM_LOG_EXPORT,
+                PERMISSIONS.SYSTEM_LOG_CLEAR,
+                // 业主管理权限
+                PERMISSIONS.PROPERTY_OWNER_VIEW,
+                PERMISSIONS.PROPERTY_OWNER_ADD,
+                PERMISSIONS.PROPERTY_OWNER_EDIT,
+                PERMISSIONS.PROPERTY_OWNER_DELETE,
+                PERMISSIONS.PROPERTY_OWNER_IMPORT,
+                PERMISSIONS.PROPERTY_OWNER_EXPORT
               ]
               break
             case USER_TYPES.OWNER:
               roles = [ROLES.OWNER]
               permissions = [
+                // 业主门户权限
                 PERMISSIONS.PORTAL_VIEW,
+                PERMISSIONS.PORTAL_DASHBOARD_VIEW,
+                PERMISSIONS.PORTAL_BILL_VIEW,
+                PERMISSIONS.PORTAL_BILL_PAY,
+                PERMISSIONS.PORTAL_PROFILE_VIEW,
+                PERMISSIONS.PORTAL_PROFILE_EDIT,
+                PERMISSIONS.PORTAL_SERVICE_APPLY,
+                // 财务相关权限
                 PERMISSIONS.PROPERTY_BILL_VIEW,
                 PERMISSIONS.PROPERTY_BILL_PAY,
                 PERMISSIONS.PROPERTY_WALLET_VIEW,
                 PERMISSIONS.PROPERTY_WALLET_RECHARGE,
+                // 服务相关权限
                 PERMISSIONS.PROPERTY_COMPLAINT_ADD,
                 PERMISSIONS.PROPERTY_COMPLAINT_RATE,
                 PERMISSIONS.PROPERTY_REPAIR_ADD,
                 PERMISSIONS.PROPERTY_REPAIR_ACCEPT,
+                // 信息查看权限
                 PERMISSIONS.PROPERTY_NOTICE_VIEW
               ]
               break

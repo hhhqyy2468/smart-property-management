@@ -188,6 +188,18 @@ export const PERMISSIONS = {
   SYSTEM_CONFIG_BACKUP: 'system:config:backup',
   SYSTEM_CONFIG_RESTORE: 'system:config:restore',
 
+  // 字典管理
+  SYSTEM_DICT_VIEW: 'system:dict:view',
+  SYSTEM_DICT_ADD: 'system:dict:add',
+  SYSTEM_DICT_EDIT: 'system:dict:edit',
+  SYSTEM_DICT_DELETE: 'system:dict:delete',
+  SYSTEM_DICT_REFRESH: 'system:dict:refresh',
+
+  // 系统日志
+  SYSTEM_LOG_VIEW: 'system:log:view',
+  SYSTEM_LOG_EXPORT: 'system:log:export',
+  SYSTEM_LOG_CLEAR: 'system:log:clear',
+
   // 物业管理
   PROPERTY_BUILDING_VIEW: 'property:building:view',
   PROPERTY_BUILDING_ADD: 'property:building:add',
@@ -208,6 +220,13 @@ export const PERMISSIONS = {
   PROPERTY_RESIDENT_ADD: 'property:resident:add',
   PROPERTY_RESIDENT_EDIT: 'property:resident:edit',
   PROPERTY_RESIDENT_DELETE: 'property:resident:delete',
+
+  PROPERTY_OWNER_VIEW: 'property:owner:view',
+  PROPERTY_OWNER_ADD: 'property:owner:add',
+  PROPERTY_OWNER_EDIT: 'property:owner:edit',
+  PROPERTY_OWNER_DELETE: 'property:owner:delete',
+  PROPERTY_OWNER_IMPORT: 'property:owner:import',
+  PROPERTY_OWNER_EXPORT: 'property:owner:export',
 
   PROPERTY_FEE_TYPE_VIEW: 'property:feeType:view',
   PROPERTY_FEE_TYPE_ADD: 'property:feeType:add',
