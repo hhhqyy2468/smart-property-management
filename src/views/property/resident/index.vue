@@ -229,11 +229,11 @@
         <el-table-column prop="houseCode" label="房产编号" width="140" />
         <el-table-column prop="buildingName" label="楼栋" width="100" />
         <el-table-column prop="unitName" label="单元" width="100" />
-        <el-table-column prop="doorNumber" label="门牌号" width="100" />
-        <el-table-column prop="layout" label="户型" width="100" />
-        <el-table-column prop="buildingArea" label="建筑面积" width="120">
+        <el-table-column prop="roomNum" label="门牌号" width="100" />
+        <el-table-column prop="houseType" label="户型" width="100" />
+        <el-table-column prop="buildArea" label="建筑面积" width="120">
           <template #default="{ row }">
-            {{ row.buildingArea }}m²
+            {{ row.buildArea }}m²
           </template>
         </el-table-column>
         <el-table-column prop="houseStatus" label="房产状态" width="100">
@@ -567,10 +567,10 @@ const getResidentTypeTag = (residentType) => {
 // 获取房产状态名称
 const getHouseStatusName = (status) => {
   const statusMap = {
-    0: '空置',
-    1: '已售',
-    2: '已租',
-    3: '自用'
+    1: '空置',
+    2: '已售',
+    3: '已租',
+    4: '自住'
   }
   return statusMap[status] || '未知'
 }
@@ -578,10 +578,10 @@ const getHouseStatusName = (status) => {
 // 获取房产状态标签
 const getHouseStatusTag = (status) => {
   const tagMap = {
-    0: 'info',
-    1: 'success',
-    2: 'warning',
-    3: 'primary'
+    1: 'info',
+    2: 'success',
+    3: 'warning',
+    4: 'primary'
   }
   return tagMap[status] || 'info'
 }
@@ -621,7 +621,7 @@ const getMockData = () => {
 // 获取模拟房产数据
 const getMockHouseData = (residentId) => {
   const houses = []
-  const houseStatuses = [1, 2, 3] // 已售、已租、自用
+  const houseStatuses = [2, 3, 4] // 已售、已租、自住
   const layouts = ['一室一厅', '两室一厅', '三室两厅']
 
   for (let i = 0; i < Math.floor(Math.random() * 3) + 1; i++) {
@@ -631,9 +631,9 @@ const getMockHouseData = (residentId) => {
       houseCode: `H${Math.floor(Math.random() * 4 + 1)}${Math.floor(Math.random() * 18 + 1)}${Math.floor(Math.random() * 3 + 1)}`,
       buildingName: `${Math.floor(Math.random() * 4 + 1)}号楼`,
       unitName: `${Math.floor(Math.random() * 4 + 1)}单元`,
-      doorNumber: `${Math.floor(Math.random() * 18 + 1)}0${Math.floor(Math.random() * 3 + 1)}`,
-      layout: layouts[Math.floor(Math.random() * layouts.length)],
-      buildingArea: 80 + Math.floor(Math.random() * 100),
+      roomNum: `${Math.floor(Math.random() * 18 + 1)}0${Math.floor(Math.random() * 3 + 1)}`,
+      houseType: layouts[Math.floor(Math.random() * layouts.length)],
+      buildArea: 80 + Math.floor(Math.random() * 100),
       houseStatus: houseStatuses[Math.floor(Math.random() * houseStatuses.length)],
       checkInTime: '2024-01-' + Math.floor(Math.random() * 28 + 1).toString().padStart(2, '0') + ' 10:00:00',
       relationType: i === 0 ? 1 : 2 // 第一个为产权人，其他为家庭成员

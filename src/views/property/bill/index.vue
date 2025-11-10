@@ -67,9 +67,9 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item label="账期" prop="billingPeriod">
+        <el-form-item label="账期" prop="billPeriod">
           <el-date-picker
-            v-model="searchForm.billingPeriod"
+            v-model="searchForm.billPeriod"
             type="month"
             placeholder="请选择账期"
             format="YYYY-MM"
@@ -141,14 +141,14 @@
         @sort-change="handleSortChange"
       >
         <!-- 应缴金额列 -->
-        <template #amountDue="{ row }">
-          <span class="amount-text">¥{{ row.amountDue.toFixed(2) }}</span>
+        <template #amount="{ row }">
+          <span class="amount-text">¥{{ row.amount.toFixed(2) }}</span>
         </template>
 
         <!-- 实缴金额列 -->
-        <template #amountPaid="{ row }">
-          <span class="amount-text" :class="getPaidAmountClass(row.amountPaid, row.amountDue)">
-            ¥{{ row.amountPaid.toFixed(2) }}
+        <template #paidAmount="{ row }">
+          <span class="amount-text" :class="getPaidAmountClass(row.paidAmount, row.amount)">
+            ¥{{ row.paidAmount.toFixed(2) }}
           </span>
         </template>
 
@@ -242,7 +242,7 @@
       <el-form :model="generateForm" label-width="100px">
         <el-form-item label="账期" required>
           <el-date-picker
-            v-model="generateForm.billingPeriod"
+            v-model="generateForm.billPeriod"
             type="month"
             placeholder="请选择账期"
             format="YYYY-MM"
@@ -313,10 +313,10 @@
           {{ payForm.billNo }}
         </el-descriptions-item>
         <el-descriptions-item label="费用类型">
-          {{ payForm.feeTypeName }}
+          {{ payForm.feeName }}
         </el-descriptions-item>
         <el-descriptions-item label="应缴金额">
-          <span class="amount-text">¥{{ payForm.amountDue?.toFixed(2) }}</span>
+          <span class="amount-text">¥{{ payForm.amount?.toFixed(2) }}</span>
         </el-descriptions-item>
         <el-descriptions-item label="缴费方式">
           <el-select v-model="payForm.paymentMethod" style="width: 200px">
@@ -373,7 +373,7 @@ const searchForm = reactive({
   houseCode: '',
   feeTypeId: '',
   billStatus: '',
-  billingPeriod: ''
+  billPeriod: ''
 })
 
 // 表格数据
@@ -409,27 +409,27 @@ const tableColumns = [
     width: '140'
   },
   {
-    prop: 'feeTypeName',
+    prop: 'feeName',
     label: '费用类型',
     width: '120'
   },
   {
-    prop: 'billingPeriod',
+    prop: 'billPeriod',
     label: '账期',
     width: '100'
   },
   {
-    prop: 'amountDue',
+    prop: 'amount',
     label: '应缴金额',
     width: '120',
-    slot: 'amountDue',
+    slot: 'amount',
     sortable: true
   },
   {
-    prop: 'amountPaid',
+    prop: 'paidAmount',
     label: '实缴金额',
     width: '120',
-    slot: 'amountPaid'
+    slot: 'paidAmount'
   },
   {
     prop: 'billStatus',
@@ -508,15 +508,15 @@ const form = reactive({
   ownerId: '',
   houseId: '',
   feeTypeId: '',
-  billingPeriod: '',
-  amountDue: 0,
+  billPeriod: '',
+  amount: 0,
   dueDate: '',
   remark: ''
 })
 
 // 批量生成表单
 const generateForm = reactive({
-  billingPeriod: '',
+  billPeriod: '',
   feeTypeId: '',
   generateRange: 1,
   targetIds: []
@@ -526,8 +526,8 @@ const generateForm = reactive({
 const payForm = reactive({
   billId: null,
   billNo: '',
-  feeTypeName: '',
-  amountDue: 0,
+  feeName: '',
+  amount: 0,
   paymentMethod: 'cash'
 })
 
@@ -542,10 +542,10 @@ const formRules = {
   feeTypeId: [
     { required: true, message: '请选择费用类型', trigger: 'change' }
   ],
-  billingPeriod: [
+  billPeriod: [
     { required: true, message: '请选择账期', trigger: 'change' }
   ],
-  amountDue: [
+  amount: [
     { required: true, message: '请输入应缴金额', trigger: 'blur' },
     { type: 'number', min: 0, message: '金额必须大于等于0', trigger: 'blur' }
   ],
@@ -576,13 +576,13 @@ const formItems = computed(() => [
     placeholder: '请选择费用类型'
   },
   {
-    prop: 'billingPeriod',
+    prop: 'billPeriod',
     label: '账期',
     type: 'month',
     placeholder: '请选择账期'
   },
   {
-    prop: 'amountDue',
+    prop: 'amount',
     label: '应缴金额',
     type: 'input',
     inputType: 'number',
@@ -628,9 +628,9 @@ const getBillStatusTag = (status) => {
 }
 
 // 获取实缴金额样式
-const getPaidAmountClass = (paid, due) => {
-  if (paid >= due) return 'paid-full'
-  if (paid > 0) return 'paid-partial'
+const getPaidAmountClass = (paidAmount, amount) => {
+  if (paidAmount >= amount) return 'paid-full'
+  if (paidAmount > 0) return 'paid-partial'
   return 'paid-none'
 }
 
@@ -651,8 +651,8 @@ const getMockData = () => {
   for (let i = 0; i < 100; i++) {
     const feeType = feeTypeOptions.value[Math.floor(Math.random() * feeTypeOptions.value.length)]
     const status = statuses[Math.floor(Math.random() * statuses.length)]
-    const amountDue = 50 + Math.floor(Math.random() * 500)
-    const amountPaid = status === 1 ? amountDue : (status === 2 ? Math.floor(amountDue * 0.6) : 0)
+    const amount = 50 + Math.floor(Math.random() * 500)
+    const paidAmount = status === 1 ? amount : (status === 2 ? Math.floor(amount * 0.6) : 0)
     const monthOffset = Math.floor(Math.random() * 6) // 最近6个月
     const billingMonth = currentMonth - monthOffset
     const billingYear = billingMonth > 0 ? currentYear : currentYear - 1
@@ -663,11 +663,11 @@ const getMockData = () => {
       billNo: `BILL${(i + 1).toString().padStart(6, '0')}`,
       ownerName: owners[i % owners.length],
       houseCode: `H${Math.floor(Math.random() * 4 + 1)}${Math.floor(Math.random() * 18 + 1)}${Math.floor(Math.random() * 3 + 1)}`,
-      feeTypeName: feeType.label,
+      feeName: feeType.label,
       feeTypeId: feeType.value,
-      billingPeriod: `${billingYear}-${actualMonth.toString().padStart(2, '0')}`,
-      amountDue: amountDue,
-      amountPaid: amountPaid,
+      billPeriod: `${billingYear}-${actualMonth.toString().padStart(2, '0')}`,
+      amount: amount,
+      paidAmount: paidAmount,
       billStatus: status,
       dueDate: `${billingYear}-${actualMonth.toString().padStart(2, '0')}-25`,
       createTime: '2024-01-01 10:00:00'
@@ -770,7 +770,7 @@ const handleBatchDelete = async () => {
 // 批量生成账单
 const handleBatchGenerate = () => {
   Object.assign(generateForm, {
-    billingPeriod: '',
+    billPeriod: '',
     feeTypeId: '',
     generateRange: 1,
     targetIds: []
@@ -780,7 +780,7 @@ const handleBatchGenerate = () => {
 
 // 提交批量生成
 const handleGenerateSubmit = async () => {
-  if (!generateForm.billingPeriod || !generateForm.feeTypeId) {
+  if (!generateForm.billPeriod || !generateForm.feeTypeId) {
     ElMessage.warning('请填写完整的生成条件')
     return
   }
@@ -809,8 +809,8 @@ const handlePay = (row) => {
   Object.assign(payForm, {
     billId: row.billId,
     billNo: row.billNo,
-    feeTypeName: row.feeTypeName,
-    amountDue: row.amountDue,
+    feeName: row.feeName,
+    amount: row.amount,
     paymentMethod: 'cash'
   })
   payDialogVisible.value = true
@@ -870,8 +870,8 @@ const resetForm = () => {
     ownerId: '',
     houseId: '',
     feeTypeId: '',
-    billingPeriod: '',
-    amountDue: 0,
+    billPeriod: '',
+    amount: 0,
     dueDate: '',
     remark: ''
   })

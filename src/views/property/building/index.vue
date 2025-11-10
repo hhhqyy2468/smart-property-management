@@ -8,9 +8,9 @@
         inline
         class="search-form"
       >
-        <el-form-item label="楼栋编号" prop="buildingCode">
+        <el-form-item label="楼栋编号" prop="buildingNo">
           <el-input
-            v-model="searchForm.buildingCode"
+            v-model="searchForm.buildingNo"
             placeholder="请输入楼栋编号"
             clearable
             style="width: 200px"
@@ -203,7 +203,7 @@ const unitData = ref([])
 
 // 搜索表单
 const searchForm = reactive({
-  buildingCode: '',
+  buildingNo: '',
   buildingName: '',
   buildYearRange: []
 })
@@ -225,7 +225,7 @@ const tableColumns = [
     width: '55'
   },
   {
-    prop: 'buildingCode',
+    prop: 'buildingNo',
     label: '楼栋编号',
     width: '120',
     sortable: true
@@ -280,7 +280,7 @@ const tableColumns = [
 // 表单数据
 const form = reactive({
   buildingId: null,
-  buildingCode: '',
+  buildingNo: '',
   buildingName: '',
   floorCount: 1,
   unitCount: 1,
@@ -291,7 +291,7 @@ const form = reactive({
 
 // 表单规则
 const formRules = {
-  buildingCode: [
+  buildingNo: [
     { required: true, message: '请输入楼栋编号', trigger: 'blur' },
     { pattern: /^[A-Z0-9-]+$/, message: '楼栋编号只能包含大写字母、数字和连字符', trigger: 'blur' }
   ],
@@ -319,7 +319,7 @@ const formRules = {
 // 表单项配置
 const formItems = computed(() => [
   {
-    prop: 'buildingCode',
+    prop: 'buildingNo',
     label: '楼栋编号',
     type: 'input',
     placeholder: '请输入楼栋编号（如：A01）',
@@ -374,7 +374,7 @@ const getMockData = () => {
   const mockBuildings = [
     {
       buildingId: 1,
-      buildingCode: 'A01',
+      buildingNo: 'A01',
       buildingName: '1号楼',
       floorCount: 18,
       unitCount: 3,
@@ -385,7 +385,7 @@ const getMockData = () => {
     },
     {
       buildingId: 2,
-      buildingCode: 'A02',
+      buildingNo: 'A02',
       buildingName: '2号楼',
       floorCount: 24,
       unitCount: 4,
@@ -396,7 +396,7 @@ const getMockData = () => {
     },
     {
       buildingId: 3,
-      buildingCode: 'B01',
+      buildingNo: 'B01',
       buildingName: '3号楼',
       floorCount: 12,
       unitCount: 2,
@@ -407,7 +407,7 @@ const getMockData = () => {
     },
     {
       buildingId: 4,
-      buildingCode: 'B02',
+      buildingNo: 'B02',
       buildingName: '4号楼',
       floorCount: 6,
       unitCount: 1,
@@ -425,7 +425,7 @@ const getMockData = () => {
 
 // 获取模拟单元数据
 const getMockUnitData = (buildingId) => {
-  const units = [
+  const unitCount = [
     {
       unitId: 1,
       buildingId: 1,
@@ -461,7 +461,7 @@ const getMockUnitData = (buildingId) => {
     }
   ]
 
-  return units.filter(unit => unit.buildingId === buildingId)
+  return unitCount.filter(unit => unit.buildingId === buildingId)
 }
 
 // 搜索
@@ -595,7 +595,7 @@ const handleSubmit = async () => {
 const resetForm = () => {
   Object.assign(form, {
     buildingId: null,
-    buildingCode: '',
+    buildingNo: '',
     buildingName: '',
     floorCount: 1,
     unitCount: 1,

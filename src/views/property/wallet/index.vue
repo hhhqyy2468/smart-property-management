@@ -555,7 +555,7 @@ const getMockData = () => {
       currentBalance: currentBalance,
       totalRecharge: totalRecharge,
       totalConsume: totalConsume,
-      walletStatus: Math.random() > 0.9 ? 0 : 1, // 10%冻结
+      walletStatus: Math.random() > 0.9 ? 2 : 1, // 10%冻结
       hasPassword: Math.random() > 0.2, // 80%已设置密码
       createTime: '2024-01-01 10:00:00',
       updateTime: '2024-01-15 14:30:00'

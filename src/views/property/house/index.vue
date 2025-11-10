@@ -17,9 +17,9 @@
           />
         </el-form-item>
 
-        <el-form-item label="门牌号" prop="doorNumber">
+        <el-form-item label="门牌号" prop="roomNum">
           <el-input
-            v-model="searchForm.doorNumber"
+            v-model="searchForm.roomNum"
             placeholder="请输入门牌号"
             clearable
             style="width: 150px"
@@ -137,8 +137,8 @@
         </template>
 
         <!-- 建筑面积列 -->
-        <template #buildingArea="{ row }">
-          {{ row.buildingArea }}m²
+        <template #buildArea="{ row }">
+          {{ row.buildArea }}m²
         </template>
 
         <!-- 操作列 -->
@@ -261,7 +261,7 @@ const currentResident = ref({})
 // 搜索表单
 const searchForm = reactive({
   houseCode: '',
-  doorNumber: '',
+  roomNum: '',
   buildingId: '',
   unitId: '',
   houseStatus: ''
@@ -300,33 +300,33 @@ const tableColumns = [
     width: '100'
   },
   {
-    prop: 'doorNumber',
+    prop: 'roomNum',
     label: '门牌号',
     width: '100',
     sortable: true
   },
   {
-    prop: 'floor',
+    prop: 'floorNum',
     label: '楼层',
     width: '80'
   },
   {
-    prop: 'layout',
+    prop: 'houseType',
     label: '户型',
     width: '100'
   },
   {
-    prop: 'buildingArea',
+    prop: 'buildArea',
     label: '建筑面积',
     width: '120',
-    slot: 'buildingArea',
+    slot: 'buildArea',
     sortable: true
   },
   {
-    prop: 'usableArea',
+    prop: 'useArea',
     label: '使用面积',
     width: '120',
-    formatter: (row) => `${row.usableArea}m²`
+    formatter: (row) => `${row.useArea}m²`
   },
   {
     prop: 'houseStatus',
@@ -365,13 +365,13 @@ const buildingOptions = ref([
 const unitOptions = ref([])
 
 const houseStatusOptions = [
-  { label: '空置', value: 0 },
-  { label: '已售', value: 1 },
-  { label: '已租', value: 2 },
-  { label: '自用', value: 3 }
+  { label: '空置', value: 1 },
+  { label: '已售', value: 2 },
+  { label: '已租', value: 3 },
+  { label: '自住', value: 4 }
 ]
 
-const layoutOptions = [
+const houseTypeOptions = [
   { label: '一室一厅', value: '一室一厅' },
   { label: '两室一厅', value: '两室一厅' },
   { label: '三室两厅', value: '三室两厅' },
@@ -384,12 +384,12 @@ const form = reactive({
   buildingId: '',
   unitId: '',
   houseCode: '',
-  doorNumber: '',
-  floor: 1,
-  layout: '',
-  buildingArea: 0,
-  usableArea: 0,
-  houseStatus: 0,
+  roomNum: '',
+  floorNum: 1,
+  houseType: '',
+  buildArea: 0,
+  useArea: 0,
+  houseStatus: 1,
   ownerName: ''
 })
 
@@ -404,21 +404,21 @@ const formRules = {
   houseCode: [
     { required: true, message: '请输入房产编号', trigger: 'blur' }
   ],
-  doorNumber: [
+  roomNum: [
     { required: true, message: '请输入门牌号', trigger: 'blur' }
   ],
-  floor: [
+  floorNum: [
     { required: true, message: '请输入楼层', trigger: 'blur' },
     { type: 'number', min: 1, message: '楼层必须大于0', trigger: 'blur' }
   ],
-  layout: [
+  houseType: [
     { required: true, message: '请选择户型', trigger: 'change' }
   ],
-  buildingArea: [
+  buildArea: [
     { required: true, message: '请输入建筑面积', trigger: 'blur' },
     { type: 'number', min: 1, message: '建筑面积必须大于0', trigger: 'blur' }
   ],
-  usableArea: [
+  useArea: [
     { required: true, message: '请输入使用面积', trigger: 'blur' },
     { type: 'number', min: 1, message: '使用面积必须大于0', trigger: 'blur' }
   ]
@@ -449,34 +449,34 @@ const formItems = computed(() => [
     disabled: isEdit.value
   },
   {
-    prop: 'doorNumber',
+    prop: 'roomNum',
     label: '门牌号',
     type: 'input',
     placeholder: '请输入门牌号'
   },
   {
-    prop: 'floor',
+    prop: 'floorNum',
     label: '楼层',
     type: 'input',
     inputType: 'number',
     placeholder: '请输入楼层'
   },
   {
-    prop: 'layout',
+    prop: 'houseType',
     label: '户型',
     type: 'select',
-    options: layoutOptions,
+    options: houseTypeOptions,
     placeholder: '请选择户型'
   },
   {
-    prop: 'buildingArea',
+    prop: 'buildArea',
     label: '建筑面积',
     type: 'input',
     inputType: 'number',
     placeholder: '请输入建筑面积（平方米）'
   },
   {
-    prop: 'usableArea',
+    prop: 'useArea',
     label: '使用面积',
     type: 'input',
     inputType: 'number',
@@ -501,9 +501,9 @@ const formItems = computed(() => [
 const dialogTitle = computed(() => isEdit.value ? '编辑房产' : '新增房产')
 
 // 监听建筑面积变化，自动计算使用面积
-watch(() => form.buildingArea, (newValue) => {
-  if (newValue && !form.usableArea) {
-    form.usableArea = Math.floor(newValue * 0.8) // 默认使用面积为建筑面积的80%
+watch(() => form.buildArea, (newValue) => {
+  if (newValue && !form.useArea) {
+    form.useArea = Math.floor(newValue * 0.8) // 默认使用面积为建筑面积的80%
   }
 })
 
@@ -516,10 +516,10 @@ const getHouseStatusName = (status) => {
 // 获取房产状态标签
 const getHouseStatusTag = (status) => {
   const tagMap = {
-    0: 'info',    // 空置
-    1: 'success', // 已售
-    2: 'warning', // 已租
-    3: 'primary'  // 自用
+    1: 'info',    // 空置
+    2: 'success', // 已售
+    3: 'warning', // 已租
+    4: 'primary'  // 自住
   }
   return tagMap[status] || 'info'
 }
@@ -568,8 +568,8 @@ const getMockUnitOptions = (buildingId) => {
 // 获取模拟数据
 const getMockData = () => {
   const mockHouses = []
-  const layouts = ['一室一厅', '两室一厅', '三室两厅', '四室两厅']
-  const statuses = [0, 1, 2, 3]
+  const houseTypes = ['一室一厅', '两室一厅', '三室两厅', '四室两厅']
+  const statuses = [1, 2, 3, 4]
   const owners = ['张三', '李四', '王五', '赵六', '钱七', '孙八', '周九', '吴十']
 
   // 为每个单元生成房产数据
@@ -577,9 +577,9 @@ const getMockData = () => {
     for (let floor = 1; floor <= 18; floor++) {
       for (let room = 1; room <= 3; room++) {
         const houseStatus = statuses[Math.floor(Math.random() * statuses.length)]
-        const layout = layouts[Math.floor(Math.random() * layouts.length)]
-        const buildingArea = 80 + Math.floor(Math.random() * 120)
-        const usableArea = Math.floor(buildingArea * 0.8)
+        const houseType = houseTypes[Math.floor(Math.random() * houseTypes.length)]
+        const buildArea = 80 + Math.floor(Math.random() * 120)
+        const useArea = Math.floor(buildArea * 0.8)
 
         mockHouses.push({
           houseId: `house_${i}_${floor}_${room}`,
@@ -588,13 +588,13 @@ const getMockData = () => {
           unitId: i,
           unitName: `${i}单元`,
           houseCode: `H${i.toString().padStart(2, '0')}${floor.toString().padStart(2, '0')}${room.toString().padStart(2, '0')}`,
-          doorNumber: `${floor}0${room}`,
-          floor: floor,
-          layout: layout,
-          buildingArea: buildingArea,
-          usableArea: usableArea,
+          roomNum: `${floor}0${room}`,
+          floorNum: floor,
+          houseType: houseType,
+          buildArea: buildArea,
+          useArea: useArea,
           houseStatus: houseStatus,
-          ownerName: houseStatus > 0 ? owners[Math.floor(Math.random() * owners.length)] : '',
+          ownerName: houseStatus > 1 ? owners[Math.floor(Math.random() * owners.length)] : '',
           createTime: '2024-01-01 10:00:00'
         })
       }
@@ -703,9 +703,9 @@ const handleViewResident = (row) => {
     ownerName: row.ownerName || '暂无',
     ownerPhone: row.ownerName ? '138****' + Math.floor(Math.random() * 10000) : '暂无',
     ownerIdCard: row.ownerName ? '110****' + Math.floor(Math.random() * 1000000000000) : '暂无',
-    checkInTime: row.houseStatus > 0 ? '2024-01-15' : '暂无',
-    residentType: row.houseStatus === 3 ? 1 : 2, // 自用为产权人，其他为租户
-    residentStatus: row.houseStatus > 0 ? 1 : 0
+    checkInTime: row.houseStatus > 1 ? '2024-01-15' : '暂无',
+    residentType: row.houseStatus === 4 ? 1 : 2, // 自住为产权人，其他为租户
+    residentStatus: row.houseStatus > 1 ? 1 : 0
   }
   residentDialogVisible.value = true
 }
@@ -746,12 +746,12 @@ const resetForm = () => {
     buildingId: '',
     unitId: '',
     houseCode: '',
-    doorNumber: '',
-    floor: 1,
-    layout: '',
-    buildingArea: 0,
-    usableArea: 0,
-    houseStatus: 0,
+    roomNum: '',
+    floorNum: 1,
+    houseType: '',
+    buildArea: 0,
+    useArea: 0,
+    houseStatus: 1,
     ownerName: ''
   })
 }
