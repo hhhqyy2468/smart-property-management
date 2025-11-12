@@ -1,14 +1,19 @@
 <template>
-  <div class="app-container">
+  <div class="log-container">
+    <!-- 页面标题 -->
+    <div class="page-header">
+      <h2 class="page-title">投诉管理</h2>
+      <el-breadcrumb separator="/">
+        <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+        <el-breadcrumb-item>服务管理</el-breadcrumb-item>
+        <el-breadcrumb-item>投诉管理</el-breadcrumb-item>
+      </el-breadcrumb>
+    </div>
+
     <!-- 搜索区域 -->
-    <el-card class="search-card">
-      <el-form
-        ref="searchFormRef"
-        :model="searchForm"
-        inline
-        class="search-form"
-      >
-        <el-form-item label="投诉单号" prop="complaintNo">
+    <div class="search-section">
+      <el-form :model="searchForm" inline>
+        <el-form-item label="投诉单号">
           <el-input
             v-model="searchForm.complaintNo"
             placeholder="请输入投诉单号"
@@ -16,8 +21,7 @@
             style="width: 200px"
           />
         </el-form-item>
-
-        <el-form-item label="投诉人" prop="complainant">
+        <el-form-item label="投诉人">
           <el-input
             v-model="searchForm.complainant"
             placeholder="请输入投诉人"
@@ -25,8 +29,7 @@
             style="width: 200px"
           />
         </el-form-item>
-
-        <el-form-item label="投诉类型" prop="complaintType">
+        <el-form-item label="投诉类型">
           <el-select
             v-model="searchForm.complaintType"
             placeholder="请选择投诉类型"
@@ -41,8 +44,7 @@
             />
           </el-select>
         </el-form-item>
-
-        <el-form-item label="投诉状态" prop="complaintStatus">
+        <el-form-item label="投诉状态">
           <el-select
             v-model="searchForm.complaintStatus"
             placeholder="请选择投诉状态"
@@ -57,7 +59,6 @@
             />
           </el-select>
         </el-form-item>
-
         <el-form-item>
           <el-button type="primary" @click="handleSearch">
             <el-icon><Search /></el-icon>
@@ -69,119 +70,179 @@
           </el-button>
         </el-form-item>
       </el-form>
-    </el-card>
+    </div>
 
-    <!-- 表格区域 -->
-    <el-card class="table-card">
-      <template #header>
-        <div class="card-header">
-          <span>投诉列表</span>
-          <div class="header-actions">
-            <el-button
-              type="primary"
-              v-permission="'property:complaint:add'"
-              @click="handleAdd"
-            >
-              <el-icon><Plus /></el-icon>
-              新增投诉
-            </el-button>
-            <el-button @click="handleExport">
-              <el-icon><Download /></el-icon>
-              导出
-            </el-button>
-          </div>
-        </div>
-      </template>
-
-      <Table
-        ref="tableRef"
-        :data="tableData"
-        :columns="tableColumns"
-        :loading="loading"
-        :pagination="pagination"
-        @page-change="handlePageChange"
-        @sort-change="handleSortChange"
+    <!-- 操作按钮 -->
+    <div class="action-section">
+      <el-button
+        type="primary"
+        @click="handleAdd"
       >
-        <!-- 紧急程度列 -->
-        <template #urgencyLevel="{ row }">
-          <el-tag :type="getUrgencyTag(row.urgencyLevel)">
-            {{ getUrgencyName(row.urgencyLevel) }}
-          </el-tag>
-        </template>
+        <el-icon><Plus /></el-icon>
+        新增投诉
+      </el-button>
+      <el-button @click="handleExport">
+        <el-icon><Download /></el-icon>
+        导出
+      </el-button>
+    </div>
 
-        <!-- 投诉状态列 -->
-        <template #complaintStatus="{ row }">
-          <el-tag :type="getStatusTag(row.complaintStatus)">
-            {{ getStatusName(row.complaintStatus) }}
-          </el-tag>
-        </template>
+    <!-- 投诉表格 -->
+    <div class="table-section">
+      <el-table
+        v-loading="loading"
+        :data="tableData"
+      >
+        <el-table-column prop="complaintNo" label="投诉单号" width="160" sortable />
+        <el-table-column prop="complainant" label="投诉人" width="120" />
+        <el-table-column prop="phone" label="联系电话" width="130" />
+        <el-table-column prop="houseCode" label="房间编号" width="140" />
+        <el-table-column prop="complaintType" label="投诉类型" width="120">
+          <template #default="{ row }">
+            <el-tag :type="getTypeTag(row.complaintType)">
+              {{ getTypeName(row.complaintType) }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="urgencyLevel" label="紧急程度" width="100">
+          <template #default="{ row }">
+            <el-tag :type="getUrgencyTag(row.urgencyLevel)">
+              {{ getUrgencyName(row.urgencyLevel) }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="complaintStatus" label="投诉状态" width="100">
+          <template #default="{ row }">
+            <el-tag :type="getStatusTag(row.complaintStatus)">
+              {{ getStatusName(row.complaintStatus) }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="handlerName" label="处理人" width="120" />
+        <el-table-column prop="complaintTime" label="投诉时间" width="180" sortable>
+          <template #default="{ row }">
+            {{ formatDateTime(row.complaintTime) }}
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="280" fixed="right">
+          <template #default="{ row }">
+            <el-button
+              link
+              type="primary"
+              @click="handleViewDetail(row)"
+            >
+              详情
+            </el-button>
+            <el-button
+              v-if="row.complaintStatus === 0"
+              link
+              type="warning"
+              @click="handleAssign(row)"
+            >
+              分配
+            </el-button>
+            <el-button
+              v-if="row.complaintStatus === 1"
+              link
+              type="success"
+              @click="handleProcess(row)"
+            >
+              处理
+            </el-button>
+            <el-button
+              v-if="row.complaintStatus === 2"
+              link
+              type="info"
+              @click="handleRate(row)"
+            >
+              评价
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
 
-        <!-- 操作列 -->
-        <template #operation="{ row }">
-          <el-button
-            link
-            type="primary"
-            @click="handleViewDetail(row)"
-          >
-            详情
-          </el-button>
-          <el-button
-            link
-            type="warning"
-            v-permission="'property:complaint:assign'"
-            v-if="row.complaintStatus === 0"
-            @click="handleAssign(row)"
-          >
-            分配
-          </el-button>
-          <el-button
-            link
-            type="success"
-            v-permission="'property:complaint:handle'"
-            v-if="row.complaintStatus === 1"
-            @click="handleProcess(row)"
-          >
-            处理
-          </el-button>
-          <el-button
-            link
-            type="info"
-            v-permission="'property:complaint:rate'"
-            v-if="row.complaintStatus === 2"
-            @click="handleRate(row)"
-          >
-            评价
-          </el-button>
-        </template>
-      </Table>
-    </el-card>
+      <div class="pagination-wrapper">
+        <el-pagination
+          v-model:current-page="pagination.current"
+          v-model:page-size="pagination.pageSize"
+          :page-sizes="[10, 20, 50, 100]"
+          :total="pagination.total"
+          layout="total, sizes, prev, pager, next, jumper"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+        />
+      </div>
+    </div>
 
     <!-- 新增/编辑投诉对话框 -->
     <el-dialog
       v-model="dialogVisible"
       :title="dialogTitle"
       width="700px"
-      @close="handleDialogClose"
     >
-      <Form
+      <el-form
         ref="formRef"
         :model="form"
         :rules="formRules"
-        :items="formItems"
         label-width="100px"
-      />
+      >
+        <el-form-item label="投诉人" prop="complainant">
+          <el-input v-model="form.complainant" placeholder="请输入投诉人姓名" />
+        </el-form-item>
+        <el-form-item label="联系电话" prop="phone">
+          <el-input v-model="form.phone" placeholder="请输入联系电话" />
+        </el-form-item>
+        <el-form-item label="房间编号" prop="houseCode">
+          <el-input v-model="form.houseCode" placeholder="请输入房间编号" />
+        </el-form-item>
+        <el-form-item label="投诉类型" prop="complaintType">
+          <el-select v-model="form.complaintType" placeholder="请选择投诉类型" style="width: 100%">
+            <el-option
+              v-for="item in complaintTypeOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="紧急程度" prop="urgencyLevel">
+          <el-radio-group v-model="form.urgencyLevel">
+            <el-radio
+              v-for="item in urgencyLevelOptions"
+              :key="item.value"
+              :label="item.value"
+            >
+              {{ item.label }}
+            </el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="投诉内容" prop="content">
+          <el-input
+            v-model="form.content"
+            type="textarea"
+            placeholder="请详细描述投诉内容"
+            :rows="4"
+          />
+        </el-form-item>
+        <el-form-item label="相关图片">
+          <el-upload
+            v-model:file-list="form.images"
+            action="#"
+            list-type="picture-card"
+            :auto-upload="false"
+            multiple
+            :limit="5"
+          >
+            <el-icon><Plus /></el-icon>
+          </el-upload>
+        </el-form-item>
+      </el-form>
 
       <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="dialogVisible = false">取消</el-button>
-          <el-button
-            type="primary"
-            :loading="submitLoading"
-            @click="handleSubmit"
-          >
-            确定
-          </el-button>
-        </span>
+        <el-button @click="dialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="handleSubmit">
+          确定
+        </el-button>
       </template>
     </el-dialog>
 
@@ -220,13 +281,13 @@
           </el-tag>
         </el-descriptions-item>
         <el-descriptions-item label="投诉时间">
-          {{ currentComplaint.complaintTime }}
+          {{ formatDateTime(currentComplaint.complaintTime) }}
         </el-descriptions-item>
         <el-descriptions-item label="处理人" v-if="currentComplaint.handlerName">
           {{ currentComplaint.handlerName }}
         </el-descriptions-item>
         <el-descriptions-item label="处理时间" v-if="currentComplaint.handleTime">
-          {{ currentComplaint.handleTime }}
+          {{ formatDateTime(currentComplaint.handleTime) }}
         </el-descriptions-item>
       </el-descriptions>
 
@@ -253,9 +314,7 @@
       </div>
 
       <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="detailDialogVisible = false">关闭</el-button>
-        </span>
+        <el-button @click="detailDialogVisible = false">关闭</el-button>
       </template>
     </el-dialog>
 
@@ -293,16 +352,106 @@
       </el-form>
 
       <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="assignDialogVisible = false">取消</el-button>
-          <el-button
-            type="primary"
-            :loading="assignLoading"
-            @click="handleAssignSubmit"
+        <el-button @click="assignDialogVisible = false">取消</el-button>
+        <el-button
+          type="primary"
+          :loading="assignLoading"
+          @click="handleAssignSubmit"
+        >
+          确定分配
+        </el-button>
+      </template>
+    </el-dialog>
+
+    <!-- 处理投诉对话框 -->
+    <el-dialog
+      v-model="processDialogVisible"
+      title="处理投诉"
+      width="600px"
+    >
+      <el-form :model="processForm" :rules="processRules" ref="processFormRef" label-width="100px">
+        <el-form-item label="投诉单号">
+          <el-input v-model="processForm.complaintNo" disabled />
+        </el-form-item>
+        <el-form-item label="投诉人">
+          <el-input v-model="processForm.complainant" disabled />
+        </el-form-item>
+        <el-form-item label="处理措施" prop="handleContent">
+          <el-input
+            v-model="processForm.handleContent"
+            type="textarea"
+            placeholder="请详细描述处理措施和结果"
+            :rows="4"
+          />
+        </el-form-item>
+        <el-form-item label="处理照片">
+          <el-upload
+            v-model:file-list="processForm.handleImages"
+            action="#"
+            list-type="picture-card"
+            :auto-upload="false"
+            multiple
+            :limit="5"
           >
-            确定分配
-          </el-button>
-        </span>
+            <el-icon><Plus /></el-icon>
+          </el-upload>
+        </el-form-item>
+      </el-form>
+
+      <template #footer>
+        <el-button @click="processDialogVisible = false">取消</el-button>
+        <el-button
+          type="primary"
+          :loading="processLoading"
+          @click="handleProcessSubmit"
+        >
+          确认处理
+        </el-button>
+      </template>
+    </el-dialog>
+
+    <!-- 评价投诉对话框 -->
+    <el-dialog
+      v-model="rateDialogVisible"
+      title="投诉评价"
+      width="500px"
+    >
+      <el-form :model="rateForm" :rules="rateRules" ref="rateFormRef" label-width="100px">
+        <el-form-item label="投诉单号">
+          <el-input v-model="rateForm.complaintNo" disabled />
+        </el-form-item>
+        <el-form-item label="处理结果">
+          <p>{{ rateForm.handleContent }}</p>
+        </el-form-item>
+        <el-form-item label="满意度评价" prop="rating">
+          <el-rate v-model="rateForm.rating" show-text />
+        </el-form-item>
+        <el-form-item label="评价等级" prop="satisfaction">
+          <el-radio-group v-model="rateForm.satisfaction">
+            <el-radio :label="1">满意</el-radio>
+            <el-radio :label="2">一般</el-radio>
+            <el-radio :label="3">不满意</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="评价意见">
+          <el-input
+            v-model="rateForm.comment"
+            type="textarea"
+            placeholder="请输入您的评价意见（可选）"
+            :rows="3"
+          />
+        </el-form-item>
+      </el-form>
+
+      <template #footer>
+        <el-button @click="rateDialogVisible = false">取消</el-button>
+        <el-button
+          type="primary"
+          :loading="rateLoading"
+          @click="handleRateSubmit"
+        >
+          提交评价
+        </el-button>
       </template>
     </el-dialog>
   </div>
@@ -312,19 +461,20 @@
 import { ref, reactive, onMounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search, Refresh, Plus, Download } from '@element-plus/icons-vue'
-import Table from '@/components/Table/index.vue'
-import Form from '@/components/Form/index.vue'
 
 // 响应式数据
-const searchFormRef = ref()
-const tableRef = ref()
 const formRef = ref()
+const processFormRef = ref()
+const rateFormRef = ref()
 const loading = ref(false)
-const submitLoading = ref(false)
 const assignLoading = ref(false)
+const processLoading = ref(false)
+const rateLoading = ref(false)
 const dialogVisible = ref(false)
 const detailDialogVisible = ref(false)
 const assignDialogVisible = ref(false)
+const processDialogVisible = ref(false)
+const rateDialogVisible = ref(false)
 const isEdit = ref(false)
 
 // 搜索表单
@@ -344,67 +494,6 @@ const pagination = reactive({
   pageSize: 10,
   total: 0
 })
-
-// 表格列配置
-const tableColumns = [
-  {
-    prop: 'complaintNo',
-    label: '投诉单号',
-    width: '160',
-    sortable: true
-  },
-  {
-    prop: 'complainant',
-    label: '投诉人',
-    width: '120'
-  },
-  {
-    prop: 'phone',
-    label: '联系电话',
-    width: '130'
-  },
-  {
-    prop: 'houseCode',
-    label: '房间编号',
-    width: '140'
-  },
-  {
-    prop: 'complaintType',
-    label: '投诉类型',
-    width: '120',
-    formatter: (row) => getTypeName(row.complaintType)
-  },
-  {
-    prop: 'urgencyLevel',
-    label: '紧急程度',
-    width: '100',
-    slot: 'urgencyLevel'
-  },
-  {
-    prop: 'complaintStatus',
-    label: '投诉状态',
-    width: '100',
-    slot: 'complaintStatus'
-  },
-  {
-    prop: 'handlerName',
-    label: '处理人',
-    width: '120'
-  },
-  {
-    prop: 'complaintTime',
-    label: '投诉时间',
-    width: '180',
-    sortable: true
-  },
-  {
-    prop: 'operation',
-    label: '操作',
-    width: '280',
-    slot: 'operation',
-    fixed: 'right'
-  }
-]
 
 // 选项数据
 const complaintTypeOptions = ref([
@@ -426,15 +515,15 @@ const urgencyLevelOptions = ref([
 const complaintStatusOptions = ref([
   { label: '待处理', value: 0 },
   { label: '处理中', value: 1 },
-  { label: '已完成', value: 2 },
+  { label: '已处理', value: 2 },
   { label: '已关闭', value: 3 }
 ])
 
 const handlerOptions = ref([
-  { label: '维修工张师傅', value: 1 },
-  { label: '维修工李师傅', value: 2 },
-  { label: '维修工王师傅', value: 3 },
-  { label: '物业经理', value: 4 }
+  { label: '物业管家-张三', value: 1 },
+  { label: '物业管家-李四', value: 2 },
+  { label: '物业管理员-王五', value: 3 },
+  { label: '物业经理-赵六', value: 4 }
 ])
 
 // 表单数据
@@ -456,6 +545,25 @@ const assignForm = reactive({
   complainant: '',
   handlerId: '',
   remark: ''
+})
+
+// 处理表单
+const processForm = reactive({
+  complaintId: null,
+  complaintNo: '',
+  complainant: '',
+  handleContent: '',
+  handleImages: []
+})
+
+// 评价表单
+const rateForm = reactive({
+  complaintId: null,
+  complaintNo: '',
+  handleContent: '',
+  rating: 5,
+  satisfaction: 1,
+  comment: ''
 })
 
 // 当前投诉
@@ -485,59 +593,32 @@ const formRules = {
   ]
 }
 
-// 表单项配置
-const formItems = computed(() => [
-  {
-    prop: 'complainant',
-    label: '投诉人',
-    type: 'input',
-    placeholder: '请输入投诉人姓名'
-  },
-  {
-    prop: 'phone',
-    label: '联系电话',
-    type: 'input',
-    placeholder: '请输入联系电话'
-  },
-  {
-    prop: 'houseCode',
-    label: '房间编号',
-    type: 'input',
-    placeholder: '请输入房间编号'
-  },
-  {
-    prop: 'complaintType',
-    label: '投诉类型',
-    type: 'select',
-    options: complaintTypeOptions.value,
-    placeholder: '请选择投诉类型'
-  },
-  {
-    prop: 'urgencyLevel',
-    label: '紧急程度',
-    type: 'radio',
-    options: urgencyLevelOptions.value
-  },
-  {
-    prop: 'content',
-    label: '投诉内容',
-    type: 'textarea',
-    placeholder: '请详细描述投诉内容',
-    rows: 4
-  },
-  {
-    prop: 'images',
-    label: '相关图片',
-    type: 'upload',
-    uploadType: 'image',
-    multiple: true,
-    limit: 5,
-    placeholder: '请上传相关图片（最多5张）'
-  }
-])
+// 处理表单规则
+const processRules = {
+  handleContent: [
+    { required: true, message: '请输入处理措施', trigger: 'blur' },
+    { min: 10, max: 500, message: '处理措施长度在10到500个字符', trigger: 'blur' }
+  ]
+}
+
+// 评价表单规则
+const rateRules = {
+  rating: [
+    { required: true, message: '请选择满意度评分', trigger: 'change' }
+  ],
+  satisfaction: [
+    { required: true, message: '请选择评价等级', trigger: 'change' }
+  ]
+}
 
 // 计算属性
 const dialogTitle = computed(() => isEdit.value ? '编辑投诉' : '新增投诉')
+
+// 格式化日期时间
+const formatDateTime = (dateTime) => {
+  if (!dateTime) return '-'
+  return new Date(dateTime).toLocaleString('zh-CN')
+}
 
 // 获取投诉类型名称
 const getTypeName = (type) => {
@@ -592,9 +673,9 @@ const getStatusTag = (status) => {
   return tagMap[status] || 'info'
 }
 
-// 获取模拟数据
-const getMockData = () => {
-  const mockComplaints = []
+// 生成模拟数据
+const generateMockData = () => {
+  const complaints = []
   const complainants = ['张三', '李四', '王五', '赵六', '钱七', '孙八', '周九', '吴十']
   const types = ['facility', 'environment', 'noise', 'safety', 'service', 'fee', 'other']
   const statuses = [0, 1, 2, 3]
@@ -605,7 +686,7 @@ const getMockData = () => {
     const status = statuses[Math.floor(Math.random() * statuses.length)]
     const urgency = urgencyLevels[Math.floor(Math.random() * urgencyLevels.length)]
 
-    mockComplaints.push({
+    complaints.push({
       complaintId: i + 1,
       complaintNo: `COMP${(i + 1).toString().padStart(6, '0')}`,
       complainant: complainants[i % complainants.length],
@@ -617,62 +698,59 @@ const getMockData = () => {
       content: '详细描述投诉内容和相关问题',
       images: Math.random() > 0.5 ? [`https://picsum.photos/200/200?random=${i}`] : [],
       handlerName: status > 0 ? handlerOptions.value[Math.floor(Math.random() * handlerOptions.value.length)].label : '',
-      handleTime: status > 0 ? '2024-01-' + Math.floor(Math.random() * 28 + 1).toString().padStart(2, '0') + ' 10:00:00' : '',
+      handleTime: status > 0 ? new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString() : '',
       handleContent: status === 2 ? '问题已处理完成，业主表示满意' : '',
-      complaintTime: '2024-01-' + Math.floor(Math.random() * 28 + 1).toString().padStart(2, '0') + ' ' +
-                     Math.floor(Math.random() * 24).toString().padStart(2, '0') + ':' +
-                     Math.floor(Math.random() * 60).toString().padStart(2, '0') + ':00'
+      complaintTime: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString()
     })
   }
 
-  // 模拟分页
-  pagination.total = mockComplaints.length
-  return mockComplaints
+  return complaints
+}
+
+// 加载投诉数据
+const loadComplaints = () => {
+  loading.value = true
+  setTimeout(() => {
+    const mockData = generateMockData()
+    tableData.value = mockData.slice(
+      (pagination.current - 1) * pagination.pageSize,
+      pagination.current * pagination.pageSize
+    )
+    pagination.total = mockData.length
+    loading.value = false
+  }, 500)
 }
 
 // 搜索
 const handleSearch = () => {
   pagination.current = 1
-  fetchData()
+  loadComplaints()
 }
 
 // 重置
 const handleReset = () => {
-  searchFormRef.value?.resetFields()
+  Object.assign(searchForm, {
+    complaintNo: '',
+    complainant: '',
+    complaintType: '',
+    complaintStatus: ''
+  })
   handleSearch()
-}
-
-// 获取数据
-const fetchData = async () => {
-  loading.value = true
-  try {
-    // 模拟API请求
-    setTimeout(() => {
-      tableData.value = getMockData()
-      loading.value = false
-    }, 500)
-  } catch (error) {
-    loading.value = false
-    ElMessage.error('获取数据失败')
-  }
-}
-
-// 分页变化
-const handlePageChange = (page) => {
-  pagination.current = page
-  fetchData()
-}
-
-// 排序变化
-const handleSortChange = (sort) => {
-  console.log('排序变化:', sort)
-  fetchData()
 }
 
 // 新增
 const handleAdd = () => {
   isEdit.value = false
-  resetForm()
+  Object.assign(form, {
+    complaintId: null,
+    complainant: '',
+    phone: '',
+    houseCode: '',
+    complaintType: '',
+    urgencyLevel: 1,
+    content: '',
+    images: []
+  })
   dialogVisible.value = true
 }
 
@@ -695,34 +773,84 @@ const handleAssign = (row) => {
 }
 
 // 提交分配
-const handleAssignSubmit = async () => {
+const handleAssignSubmit = () => {
   if (!assignForm.handlerId) {
     ElMessage.warning('请选择处理人')
     return
   }
 
   assignLoading.value = true
-  try {
-    // 模拟API请求
-    setTimeout(() => {
-      ElMessage.success('分配成功')
-      assignDialogVisible.value = false
-      fetchData()
-      assignLoading.value = false
-    }, 1000)
-  } catch (error) {
+  setTimeout(() => {
+    ElMessage.success('分配成功')
+    assignDialogVisible.value = false
+    loadComplaints()
     assignLoading.value = false
-  }
+  }, 1000)
 }
 
 // 处理投诉
 const handleProcess = (row) => {
-  ElMessage.info(`处理投诉单 ${row.complaintNo}`)
+  Object.assign(processForm, {
+    complaintId: row.complaintId,
+    complaintNo: row.complaintNo,
+    complainant: row.complainant,
+    handleContent: '',
+    handleImages: []
+  })
+  processDialogVisible.value = true
 }
 
 // 评价投诉
 const handleRate = (row) => {
-  ElMessage.info(`评价投诉单 ${row.complaintNo}`)
+  Object.assign(rateForm, {
+    complaintId: row.complaintId,
+    complaintNo: row.complaintNo,
+    handleContent: row.handleContent || '暂无处理结果',
+    rating: 5,
+    satisfaction: 1,
+    comment: ''
+  })
+  rateDialogVisible.value = true
+}
+
+// 提交处理
+const handleProcessSubmit = async () => {
+  if (!processFormRef.value) return
+
+  try {
+    await processFormRef.value.validate()
+    processLoading.value = true
+
+    // 模拟API请求
+    setTimeout(() => {
+      ElMessage.success('处理完成')
+      processDialogVisible.value = false
+      loadComplaints()
+      processLoading.value = false
+    }, 1000)
+  } catch (error) {
+    processLoading.value = false
+  }
+}
+
+// 提交评价
+const handleRateSubmit = async () => {
+  if (!rateFormRef.value) return
+
+  try {
+    await rateFormRef.value.validate()
+    rateLoading.value = true
+
+    // 模拟API请求
+    setTimeout(() => {
+      ElMessage.success('评价提交成功')
+      rateDialogVisible.value = false
+      loadComplaints()
+      rateLoading.value = false
+    }, 1000)
+  } catch (error) {
+    rateLoading.value = false
+  }
 }
 
 // 导出
@@ -731,76 +859,64 @@ const handleExport = () => {
 }
 
 // 提交表单
-const handleSubmit = async () => {
+const handleSubmit = () => {
   if (!formRef.value) return
 
-  try {
-    await formRef.value.validate()
-    submitLoading.value = true
-
-    // 模拟API请求
-    setTimeout(() => {
-      ElMessage.success(isEdit.value ? '编辑成功' : '新增成功')
+  formRef.value.validate((valid) => {
+    if (valid) {
+      ElMessage.success(dialogTitle.value + '成功')
       dialogVisible.value = false
-      fetchData()
-      submitLoading.value = false
-    }, 1000)
-  } catch (error) {
-    submitLoading.value = false
-  }
-}
-
-// 重置表单
-const resetForm = () => {
-  Object.assign(form, {
-    complaintId: null,
-    complainant: '',
-    phone: '',
-    houseCode: '',
-    complaintType: '',
-    urgencyLevel: 1,
-    content: '',
-    images: []
+      loadComplaints()
+    }
   })
 }
 
-// 对话框关闭
-const handleDialogClose = () => {
-  formRef.value?.resetFields()
-  resetForm()
+// 分页处理
+const handleSizeChange = (val) => {
+  pagination.pageSize = val
+  loadComplaints()
 }
 
-// 组件挂载
+const handleCurrentChange = (val) => {
+  pagination.current = val
+  loadComplaints()
+}
+
+// 初始化
 onMounted(() => {
-  fetchData()
+  loadComplaints()
 })
 </script>
 
 <style lang="scss" scoped>
-.app-container {
+.log-container {
+  padding: 20px;
+}
+
+.page-header {
+  margin-bottom: 20px;
+
+  .page-title {
+    margin: 0 0 16px 0;
+    font-size: 24px;
+    font-weight: 600;
+    color: #303133;
+  }
+}
+
+.search-section,
+.action-section {
+  margin-bottom: 20px;
+}
+
+.table-section {
+  background: #fff;
+  border-radius: 4px;
   padding: 20px;
 
-  .search-card {
-    margin-bottom: 20px;
-
-    .search-form {
-      .el-form-item {
-        margin-bottom: 0;
-      }
-    }
-  }
-
-  .table-card {
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-
-      .header-actions {
-        display: flex;
-        gap: 10px;
-      }
-    }
+  .pagination-wrapper {
+    margin-top: 20px;
+    text-align: right;
   }
 }
 </style>

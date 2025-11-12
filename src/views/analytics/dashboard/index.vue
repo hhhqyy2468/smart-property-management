@@ -175,7 +175,18 @@
 <script setup>
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { ElMessage } from 'element-plus'
-import { OfficeBuilding, House, User, Money, Refresh } from '@element-plus/icons-vue'
+import {
+  OfficeBuilding,
+  House,
+  User,
+  Money,
+  Refresh,
+  TrendCharts,
+  DataAnalysis,
+  PieChart,
+  Histogram,
+  Odometer
+} from '@element-plus/icons-vue'
 import * as echarts from 'echarts'
 
 // 响应式数据
@@ -197,7 +208,7 @@ let parkingChart = null
 
 // 概览数据
 const overviewData = ref({
-  totalBuildings: 12,
+  totalBuildings: 4,
   totalHouseholds: 856,
   totalResidents: 2145,
   totalRevenue: 1256800
@@ -323,9 +334,7 @@ const initOccupancyChart = () => {
     { name: '1号楼', rate: 85 },
     { name: '2号楼', rate: 92 },
     { name: '3号楼', rate: 78 },
-    { name: '4号楼', rate: 88 },
-    { name: '5号楼', rate: 95 },
-    { name: '6号楼', rate: 82 }
+    { name: '4号楼', rate: 88 }
   ]
 
   const option = {
@@ -367,7 +376,7 @@ const initOccupancyChart = () => {
         type: 'bar',
         itemStyle: {
           color: function(params) {
-            const colors = ['#5470C6', '#91CC75', '#FAC858', '#EE6666', '#73C0DE', '#3BA272']
+            const colors = ['#5470C6', '#91CC75', '#FAC858', '#EE6666']
             return colors[params.dataIndex % colors.length]
           }
         },
@@ -561,6 +570,16 @@ const changeRevenuePeriod = (period) => {
       }
     ]
   })
+  ElMessage.info(`已切换到${period === 'week' ? '近一周' : period === 'month' ? '近一月' : '近一年'}数据`)
+}
+
+// 自适应图表大小
+const resizeCharts = () => {
+  if (revenueChart) revenueChart.resize()
+  if (occupancyChart) occupancyChart.resize()
+  if (feeTypeChart) feeTypeChart.resize()
+  if (complaintChart) complaintChart.resize()
+  if (parkingChart) parkingChart.resize()
 }
 
 // 刷新实时数据
@@ -584,15 +603,6 @@ const refreshRealtimeData = () => {
     realtimeLoading.value = false
     ElMessage.success('实时数据已更新')
   }, 1000)
-}
-
-// 自适应图表大小
-const resizeCharts = () => {
-  if (revenueChart) revenueChart.resize()
-  if (occupancyChart) occupancyChart.resize()
-  if (feeTypeChart) feeTypeChart.resize()
-  if (complaintChart) complaintChart.resize()
-  if (parkingChart) parkingChart.resize()
 }
 
 // 组件挂载

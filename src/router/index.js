@@ -11,13 +11,38 @@ const routes = [
     path: '/',
     name: 'Layout',
     component: () => import('@/components/Layout/index.vue'),
-    redirect: '/dashboard',
+    redirect: () => {
+      // 动态重定向逻辑
+      const userType = localStorage.getItem('userType')
+      if (userType === '3') {
+        return '/portal/dashboard'
+      } else if (userType === '4') {
+        return '/work/pending'
+      } else {
+        return '/dashboard'
+      }
+    },
     children: [
       {
         path: 'dashboard',
         name: 'Dashboard',
         component: () => import('@/views/dashboard/index.vue'),
         meta: { title: '首页', icon: 'House' }
+      }
+    ]
+  },
+  // 数据分析 - 仅系统管理员可见
+  {
+    path: '/analytics',
+    name: 'Analytics',
+    component: () => import('@/components/Layout/index.vue'),
+    meta: { title: '数据分析', icon: 'TrendCharts' },
+    children: [
+      {
+        path: 'dashboard',
+        name: 'AnalyticsDashboard',
+        component: () => import('@/views/analytics/dashboard/index.vue'),
+        meta: { title: '数据大屏', icon: 'Monitor' }
       }
     ]
   },
@@ -57,6 +82,12 @@ const routes = [
         name: 'SystemDict',
         component: () => import('@/views/system/dict/index.vue'),
         meta: { title: '字典管理', icon: 'Document' }
+      },
+      {
+        path: 'log',
+        name: 'SystemLog',
+        component: () => import('@/views/system/log/index.vue'),
+        meta: { title: '系统日志', icon: 'View' }
       },
       ]
   },
@@ -151,14 +182,14 @@ const routes = [
       {
         path: 'space',
         name: 'ParkingSpace',
-        component: () => import('@/views/property/parking/index.vue'),
+        component: () => import('@/views/parking/space/index.vue'),
         meta: { title: '车位管理', icon: 'Van' }
       },
       {
         path: 'rental',
         name: 'ParkingRental',
-        component: () => import('@/views/property/parking/index.vue'),
-        meta: { title: '租赁管理', icon: 'Van' }
+        component: () => import('@/views/parking/rental/index.vue'),
+        meta: { title: '租赁管理', icon: 'Document' }
       }
     ]
   },

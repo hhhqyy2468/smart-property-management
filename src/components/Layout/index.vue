@@ -23,6 +23,12 @@
           <template #title>工作台</template>
         </el-menu-item>
 
+        <!-- 数据大屏 - 仅系统管理员可见 -->
+        <el-menu-item index="/analytics/dashboard" v-user-type="1">
+          <el-icon><TrendCharts /></el-icon>
+          <template #title>数据大屏</template>
+        </el-menu-item>
+
         <!-- 系统管理 - 仅系统管理员可见 -->
         <el-sub-menu index="/system" v-user-type="1">
           <template #title>
@@ -136,7 +142,7 @@
         <!-- 业主门户菜单 - 仅业主可见 -->
         <el-menu-item index="/portal/dashboard" v-user-type="3">
           <el-icon><House /></el-icon>
-          <template #title>首页</template>
+          <template #title>业主首页</template>
         </el-menu-item>
 
         <el-menu-item index="/portal/bills" v-user-type="3">
@@ -272,7 +278,8 @@ import {
   Expand,
   ArrowDown,
   CreditCard,
-  ChatDotRound
+  ChatDotRound,
+  TrendCharts
 } from '@element-plus/icons-vue'
 
 const route = useRoute()
@@ -283,6 +290,7 @@ const userStore = useUserStore()
 const sidebarOpened = computed(() => appStore.sidebarStatus)
 const activeMenu = computed(() => route.path)
 const currentRoute = computed(() => route)
+
 
 const toggleSidebar = () => {
   appStore.toggleSidebar()

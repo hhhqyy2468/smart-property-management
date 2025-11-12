@@ -1,14 +1,19 @@
 <template>
-  <div class="app-container">
+  <div class="log-container">
+    <!-- 页面标题 -->
+    <div class="page-header">
+      <h2 class="page-title">账单管理</h2>
+      <el-breadcrumb separator="/">
+        <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+        <el-breadcrumb-item>费用管理</el-breadcrumb-item>
+        <el-breadcrumb-item>账单管理</el-breadcrumb-item>
+      </el-breadcrumb>
+    </div>
+
     <!-- 搜索区域 -->
-    <el-card class="search-card">
-      <el-form
-        ref="searchFormRef"
-        :model="searchForm"
-        inline
-        class="search-form"
-      >
-        <el-form-item label="账单编号" prop="billNo">
+    <div class="search-section">
+      <el-form :model="searchForm" inline>
+        <el-form-item label="账单编号">
           <el-input
             v-model="searchForm.billNo"
             placeholder="请输入账单编号"
@@ -16,8 +21,7 @@
             style="width: 200px"
           />
         </el-form-item>
-
-        <el-form-item label="业主姓名" prop="ownerName">
+        <el-form-item label="业主姓名">
           <el-input
             v-model="searchForm.ownerName"
             placeholder="请输入业主姓名"
@@ -25,8 +29,7 @@
             style="width: 200px"
           />
         </el-form-item>
-
-        <el-form-item label="房间编号" prop="houseCode">
+        <el-form-item label="房间编号">
           <el-input
             v-model="searchForm.houseCode"
             placeholder="请输入房间编号"
@@ -34,8 +37,7 @@
             style="width: 200px"
           />
         </el-form-item>
-
-        <el-form-item label="费用类型" prop="feeTypeId">
+        <el-form-item label="费用类型">
           <el-select
             v-model="searchForm.feeTypeId"
             placeholder="请选择费用类型"
@@ -50,8 +52,7 @@
             />
           </el-select>
         </el-form-item>
-
-        <el-form-item label="账单状态" prop="billStatus">
+        <el-form-item label="账单状态">
           <el-select
             v-model="searchForm.billStatus"
             placeholder="请选择账单状态"
@@ -66,8 +67,7 @@
             />
           </el-select>
         </el-form-item>
-
-        <el-form-item label="账期" prop="billPeriod">
+        <el-form-item label="账期">
           <el-date-picker
             v-model="searchForm.billPeriod"
             type="month"
@@ -77,7 +77,6 @@
             style="width: 150px"
           />
         </el-form-item>
-
         <el-form-item>
           <el-button type="primary" @click="handleSearch">
             <el-icon><Search /></el-icon>
@@ -89,147 +88,193 @@
           </el-button>
         </el-form-item>
       </el-form>
-    </el-card>
+    </div>
 
-    <!-- 表格区域 -->
-    <el-card class="table-card">
-      <template #header>
-        <div class="card-header">
-          <span>账单列表</span>
-          <div class="header-actions">
-            <el-button
-              type="primary"
-              v-permission="'property:bill:add'"
-              @click="handleAdd"
-            >
-              <el-icon><Plus /></el-icon>
-              新增账单
-            </el-button>
-            <el-button
-              type="success"
-              v-permission="'property:bill:generate'"
-              @click="handleBatchGenerate"
-            >
-              <el-icon><Promotion /></el-icon>
-              批量生成账单
-            </el-button>
-            <el-button
-              type="danger"
-              v-permission="'property:bill:delete'"
-              :disabled="selectedRows.length === 0"
-              @click="handleBatchDelete"
-            >
-              <el-icon><Delete /></el-icon>
-              批量删除
-            </el-button>
-            <el-button @click="handleExport">
-              <el-icon><Download /></el-icon>
-              导出
-            </el-button>
-          </div>
-        </div>
-      </template>
-
-      <Table
-        ref="tableRef"
-        :data="tableData"
-        :columns="tableColumns"
-        :loading="loading"
-        :pagination="pagination"
-        @selection-change="handleSelectionChange"
-        @page-change="handlePageChange"
-        @sort-change="handleSortChange"
+    <!-- 操作按钮 -->
+    <div class="action-section">
+      <el-button
+        type="primary"
+        @click="handleAdd"
       >
-        <!-- 应缴金额列 -->
-        <template #amount="{ row }">
-          <span class="amount-text">¥{{ row.amount.toFixed(2) }}</span>
-        </template>
+        <el-icon><Plus /></el-icon>
+        新增账单
+      </el-button>
+      <el-button
+        type="success"
+        @click="handleBatchGenerate"
+      >
+        <el-icon><Promotion /></el-icon>
+        批量生成账单
+      </el-button>
+      <el-button
+        type="danger"
+        :disabled="selectedRows.length === 0"
+        @click="handleBatchDelete"
+      >
+        <el-icon><Delete /></el-icon>
+        批量删除
+      </el-button>
+      <el-button @click="handleExport">
+        <el-icon><Download /></el-icon>
+        导出
+      </el-button>
+    </div>
 
-        <!-- 实缴金额列 -->
-        <template #paidAmount="{ row }">
-          <span class="amount-text" :class="getPaidAmountClass(row.paidAmount, row.amount)">
-            ¥{{ row.paidAmount.toFixed(2) }}
-          </span>
-        </template>
+    <!-- 账单表格 -->
+    <div class="table-section">
+      <el-table
+        v-loading="loading"
+        :data="tableData"
+        @selection-change="handleSelectionChange"
+      >
+        <el-table-column type="selection" width="55" />
+        <el-table-column prop="billNo" label="账单编号" width="160" sortable />
+        <el-table-column prop="ownerName" label="业主姓名" width="120" />
+        <el-table-column prop="houseCode" label="房间编号" width="140" />
+        <el-table-column prop="feeName" label="费用类型" width="120" />
+        <el-table-column prop="billPeriod" label="账期" width="100" />
+        <el-table-column prop="amount" label="应缴金额" width="120" sortable>
+          <template #default="{ row }">
+            <span class="amount-text">¥{{ row.amount.toFixed(2) }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="paidAmount" label="实缴金额" width="120">
+          <template #default="{ row }">
+            <span class="amount-text" :class="getPaidAmountClass(row.paidAmount, row.amount)">
+              ¥{{ row.paidAmount.toFixed(2) }}
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="billStatus" label="账单状态" width="100">
+          <template #default="{ row }">
+            <el-tag :type="getBillStatusTag(row.billStatus)">
+              {{ getBillStatusName(row.billStatus) }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="dueDate" label="缴费截止时间" width="120">
+          <template #default="{ row }">
+            <span :class="{ 'overdue': isOverdue(row.dueDate, row.billStatus) }">
+              {{ row.dueDate }}
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="createTime" label="创建时间" width="180" sortable>
+          <template #default="{ row }">
+            {{ formatDateTime(row.createTime) }}
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="280" fixed="right">
+          <template #default="{ row }">
+            <el-button
+              link
+              type="primary"
+              @click="handleEdit(row)"
+            >
+              编辑
+            </el-button>
+            <el-button
+              v-if="row.billStatus === 0"
+              link
+              type="success"
+              @click="handlePay(row)"
+            >
+              缴费
+            </el-button>
+            <el-button
+              link
+              type="info"
+              @click="handleViewDetail(row)"
+            >
+              详情
+            </el-button>
+            <el-button
+              link
+              type="danger"
+              @click="handleDelete(row)"
+            >
+              删除
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
 
-        <!-- 账单状态列 -->
-        <template #billStatus="{ row }">
-          <el-tag :type="getBillStatusTag(row.billStatus)">
-            {{ getBillStatusName(row.billStatus) }}
-          </el-tag>
-        </template>
+      <div class="pagination-wrapper">
+        <el-pagination
+          v-model:current-page="pagination.current"
+          v-model:page-size="pagination.pageSize"
+          :page-sizes="[10, 20, 50, 100]"
+          :total="pagination.total"
+          layout="total, sizes, prev, pager, next, jumper"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+        />
+      </div>
+    </div>
 
-        <!-- 缴费截止时间列 -->
-        <template #dueDate="{ row }">
-          <span :class="{ 'overdue': isOverdue(row.dueDate, row.billStatus) }">
-            {{ row.dueDate }}
-          </span>
-        </template>
-
-        <!-- 操作列 -->
-        <template #operation="{ row }">
-          <el-button
-            link
-            type="primary"
-            v-permission="'property:bill:edit'"
-            @click="handleEdit(row)"
-          >
-            编辑
-          </el-button>
-          <el-button
-            link
-            type="success"
-            v-permission="'property:bill:pay'"
-            v-if="row.billStatus === 0"
-            @click="handlePay(row)"
-          >
-            缴费
-          </el-button>
-          <el-button
-            link
-            type="info"
-            @click="handleViewDetail(row)"
-          >
-            详情
-          </el-button>
-          <el-button
-            link
-            type="danger"
-            v-permission="'property:bill:delete'"
-            @click="handleDelete(row)"
-          >
-            删除
-          </el-button>
-        </template>
-      </Table>
-    </el-card>
-
-    <!-- 新增/编辑对话框 -->
+    <!-- 新增/编辑账单对话框 -->
     <el-dialog
       v-model="dialogVisible"
       :title="dialogTitle"
       width="700px"
-      @close="handleDialogClose"
     >
-      <Form
+      <el-form
         ref="formRef"
         :model="form"
         :rules="formRules"
-        :items="formItems"
         label-width="100px"
-      />
+      >
+        <el-form-item label="业主" prop="ownerId">
+          <el-input v-model="form.ownerId" placeholder="请输入业主姓名" />
+        </el-form-item>
+        <el-form-item label="房产" prop="houseId">
+          <el-input v-model="form.houseId" placeholder="请选择房产" />
+        </el-form-item>
+        <el-form-item label="费用类型" prop="feeTypeId">
+          <el-select v-model="form.feeTypeId" placeholder="请选择费用类型" style="width: 100%">
+            <el-option
+              v-for="item in feeTypeOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="账期" prop="billPeriod">
+          <el-date-picker
+            v-model="form.billPeriod"
+            type="month"
+            placeholder="请选择账期"
+            format="YYYY-MM"
+            value-format="YYYY-MM"
+            style="width: 100%"
+          />
+        </el-form-item>
+        <el-form-item label="应缴金额" prop="amount">
+          <el-input-number v-model="form.amount" :min="0" :precision="2" style="width: 100%" />
+        </el-form-item>
+        <el-form-item label="缴费截止时间" prop="dueDate">
+          <el-date-picker
+            v-model="form.dueDate"
+            type="date"
+            placeholder="请选择缴费截止时间"
+            style="width: 100%"
+          />
+        </el-form-item>
+        <el-form-item label="备注" prop="remark">
+          <el-input
+            v-model="form.remark"
+            type="textarea"
+            placeholder="请输入备注信息"
+          />
+        </el-form-item>
+      </el-form>
 
       <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="dialogVisible = false">取消</el-button>
-          <el-button
-            type="primary"
-            :loading="submitLoading"
-            @click="handleSubmit"
-          >
-            确定
-          </el-button>
-        </span>
+        <el-button @click="dialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="handleSubmit">
+          确定
+        </el-button>
       </template>
     </el-dialog>
 
@@ -289,16 +334,14 @@
       </el-form>
 
       <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="generateDialogVisible = false">取消</el-button>
-          <el-button
-            type="primary"
-            :loading="generateLoading"
-            @click="handleGenerateSubmit"
-          >
-            确定生成
-          </el-button>
-        </span>
+        <el-button @click="generateDialogVisible = false">取消</el-button>
+        <el-button
+          type="primary"
+          :loading="generateLoading"
+          @click="handleGenerateSubmit"
+        >
+          确定生成
+        </el-button>
       </template>
     </el-dialog>
 
@@ -330,16 +373,14 @@
       </el-descriptions>
 
       <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="payDialogVisible = false">取消</el-button>
-          <el-button
-            type="success"
-            :loading="payLoading"
-            @click="handlePaySubmit"
-          >
-            确认缴费
-          </el-button>
-        </span>
+        <el-button @click="payDialogVisible = false">取消</el-button>
+        <el-button
+          type="success"
+          :loading="payLoading"
+          @click="handlePaySubmit"
+        >
+          确认缴费
+        </el-button>
       </template>
     </el-dialog>
   </div>
@@ -349,22 +390,17 @@
 import { ref, reactive, onMounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search, Refresh, Plus, Delete, Download, Promotion } from '@element-plus/icons-vue'
-import Table from '@/components/Table/index.vue'
-import Form from '@/components/Form/index.vue'
 
 // 响应式数据
-const searchFormRef = ref()
-const tableRef = ref()
 const formRef = ref()
 const loading = ref(false)
-const submitLoading = ref(false)
-const generateLoading = ref(false)
-const payLoading = ref(false)
 const dialogVisible = ref(false)
 const generateDialogVisible = ref(false)
 const payDialogVisible = ref(false)
 const selectedRows = ref([])
 const isEdit = ref(false)
+const generateLoading = ref(false)
+const payLoading = ref(false)
 
 // 搜索表单
 const searchForm = reactive({
@@ -386,79 +422,6 @@ const pagination = reactive({
   total: 0
 })
 
-// 表格列配置
-const tableColumns = [
-  {
-    type: 'selection',
-    width: '55'
-  },
-  {
-    prop: 'billNo',
-    label: '账单编号',
-    width: '160',
-    sortable: true
-  },
-  {
-    prop: 'ownerName',
-    label: '业主姓名',
-    width: '120'
-  },
-  {
-    prop: 'houseCode',
-    label: '房间编号',
-    width: '140'
-  },
-  {
-    prop: 'feeName',
-    label: '费用类型',
-    width: '120'
-  },
-  {
-    prop: 'billPeriod',
-    label: '账期',
-    width: '100'
-  },
-  {
-    prop: 'amount',
-    label: '应缴金额',
-    width: '120',
-    slot: 'amount',
-    sortable: true
-  },
-  {
-    prop: 'paidAmount',
-    label: '实缴金额',
-    width: '120',
-    slot: 'paidAmount'
-  },
-  {
-    prop: 'billStatus',
-    label: '账单状态',
-    width: '100',
-    slot: 'billStatus'
-  },
-  {
-    prop: 'dueDate',
-    label: '缴费截止时间',
-    width: '120',
-    slot: 'dueDate',
-    sortable: true
-  },
-  {
-    prop: 'createTime',
-    label: '创建时间',
-    width: '180',
-    sortable: true
-  },
-  {
-    prop: 'operation',
-    label: '操作',
-    width: '280',
-    slot: 'operation',
-    fixed: 'right'
-  }
-]
-
 // 选项数据
 const feeTypeOptions = ref([
   { label: '物业费', value: 1 },
@@ -477,14 +440,6 @@ const billStatusOptions = ref([
   { label: '部分缴费', value: 2 },
   { label: '逾期', value: 3 },
   { label: '已作废', value: 4 }
-])
-
-const paymentMethodOptions = ref([
-  { label: '现金', value: 'cash' },
-  { label: '银行转账', value: 'bank' },
-  { label: '微信支付', value: 'wechat' },
-  { label: '支付宝', value: 'alipay' },
-  { label: '钱包支付', value: 'wallet' }
 ])
 
 const buildingOptions = ref([
@@ -554,60 +509,17 @@ const formRules = {
   ]
 }
 
-// 表单项配置
-const formItems = computed(() => [
-  {
-    prop: 'ownerId',
-    label: '业主',
-    type: 'input',
-    placeholder: '请输入业主姓名'
-  },
-  {
-    prop: 'houseId',
-    label: '房产',
-    type: 'input',
-    placeholder: '请选择房产'
-  },
-  {
-    prop: 'feeTypeId',
-    label: '费用类型',
-    type: 'select',
-    options: feeTypeOptions.value,
-    placeholder: '请选择费用类型'
-  },
-  {
-    prop: 'billPeriod',
-    label: '账期',
-    type: 'month',
-    placeholder: '请选择账期'
-  },
-  {
-    prop: 'amount',
-    label: '应缴金额',
-    type: 'input',
-    inputType: 'number',
-    placeholder: '请输入应缴金额',
-    prepend: '¥'
-  },
-  {
-    prop: 'dueDate',
-    label: '缴费截止时间',
-    type: 'date',
-    placeholder: '请选择缴费截止时间'
-  },
-  {
-    prop: 'remark',
-    label: '备注',
-    type: 'textarea',
-    placeholder: '请输入备注信息'
-  }
-])
-
 // 计算属性
 const dialogTitle = computed(() => isEdit.value ? '编辑账单' : '新增账单')
 const targetOptions = computed(() => {
   return generateForm.generateRange === 2 ? buildingOptions.value : unitOptions.value
 })
+
+// 格式化日期时间
+const formatDateTime = (dateTime) => {
+  if (!dateTime) return '-'
+  return new Date(dateTime).toLocaleString('zh-CN')
+}
 
 // 获取账单状态名称
 const getBillStatusName = (status) => {
@@ -640,9 +552,9 @@ const isOverdue = (dueDate, status) => {
   return new Date(dueDate) < new Date()
 }
 
-// 获取模拟数据
-const getMockData = () => {
-  const mockBills = []
+// 生成模拟数据
+const generateMockData = () => {
+  const bills = []
   const owners = ['张三', '李四', '王五', '赵六', '钱七', '孙八', '周九', '吴十']
   const statuses = [0, 1, 2, 3]
   const currentYear = new Date().getFullYear()
@@ -658,7 +570,7 @@ const getMockData = () => {
     const billingYear = billingMonth > 0 ? currentYear : currentYear - 1
     const actualMonth = billingMonth > 0 ? billingMonth : billingMonth + 12
 
-    mockBills.push({
+    bills.push({
       billId: i + 1,
       billNo: `BILL${(i + 1).toString().padStart(6, '0')}`,
       ownerName: owners[i % owners.length],
@@ -670,101 +582,107 @@ const getMockData = () => {
       paidAmount: paidAmount,
       billStatus: status,
       dueDate: `${billingYear}-${actualMonth.toString().padStart(2, '0')}-25`,
-      createTime: '2024-01-01 10:00:00'
+      createTime: new Date('2024-01-01 10:00:00').toISOString()
     })
   }
 
-  // 模拟分页
-  pagination.total = mockBills.length
-  return mockBills
+  return bills
+}
+
+// 加载账单数据
+const loadBills = () => {
+  loading.value = true
+  setTimeout(() => {
+    const mockData = generateMockData()
+    tableData.value = mockData.slice(
+      (pagination.current - 1) * pagination.pageSize,
+      pagination.current * pagination.pageSize
+    )
+    pagination.total = mockData.length
+    loading.value = false
+  }, 500)
 }
 
 // 搜索
 const handleSearch = () => {
   pagination.current = 1
-  fetchData()
+  loadBills()
 }
 
 // 重置
 const handleReset = () => {
-  searchFormRef.value?.resetFields()
+  Object.assign(searchForm, {
+    billNo: '',
+    ownerName: '',
+    houseCode: '',
+    feeTypeId: '',
+    billStatus: '',
+    billPeriod: ''
+  })
   handleSearch()
-}
-
-// 获取数据
-const fetchData = async () => {
-  loading.value = true
-  try {
-    // 模拟API请求
-    setTimeout(() => {
-      tableData.value = getMockData()
-      loading.value = false
-    }, 500)
-  } catch (error) {
-    loading.value = false
-    ElMessage.error('获取数据失败')
-  }
-}
-
-// 分页变化
-const handlePageChange = (page) => {
-  pagination.current = page
-  fetchData()
-}
-
-// 排序变化
-const handleSortChange = (sort) => {
-  console.log('排序变化:', sort)
-  fetchData()
-}
-
-// 选择变化
-const handleSelectionChange = (selection) => {
-  selectedRows.value = selection
 }
 
 // 新增
 const handleAdd = () => {
   isEdit.value = false
-  resetForm()
+  Object.assign(form, {
+    billId: null,
+    billNo: '',
+    ownerId: '',
+    houseId: '',
+    feeTypeId: '',
+    billPeriod: '',
+    amount: 0,
+    dueDate: '',
+    remark: ''
+  })
   dialogVisible.value = true
 }
 
 // 编辑
 const handleEdit = (row) => {
   isEdit.value = true
-  Object.assign(form, { ...row })
+  Object.assign(form, row)
   dialogVisible.value = true
 }
 
 // 删除
-const handleDelete = async (row) => {
-  try {
-    await ElMessageBox.confirm(
-      `确定要删除账单"${row.billNo}"吗？`,
-      '提示',
-      { type: 'warning' }
-    )
+const handleDelete = (row) => {
+  ElMessageBox.confirm(
+    `确定要删除账单"${row.billNo}"吗？`,
+    '警告',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    }
+  ).then(() => {
     ElMessage.success('删除成功')
-    fetchData()
-  } catch (error) {
+    loadBills()
+  }).catch(() => {
     // 用户取消操作
-  }
+  })
 }
 
 // 批量删除
-const handleBatchDelete = async () => {
-  try {
-    await ElMessageBox.confirm(
-      `确定要删除选中的${selectedRows.value.length}个账单吗？`,
-      '提示',
-      { type: 'warning' }
-    )
-    ElMessage.success('批量删除成功')
-    fetchData()
-  } catch (error) {
-    // 用户取消操作
+const handleBatchDelete = () => {
+  if (selectedRows.value.length === 0) {
+    ElMessage.warning('请选择要删除的账单')
+    return
   }
+
+  ElMessageBox.confirm(
+    `确定要删除选中的${selectedRows.value.length}个账单吗？`,
+    '批量删除',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    }
+  ).then(() => {
+    ElMessage.success('批量删除成功')
+    loadBills()
+  })
 }
 
 // 批量生成账单
@@ -779,7 +697,7 @@ const handleBatchGenerate = () => {
 }
 
 // 提交批量生成
-const handleGenerateSubmit = async () => {
+const handleGenerateSubmit = () => {
   if (!generateForm.billPeriod || !generateForm.feeTypeId) {
     ElMessage.warning('请填写完整的生成条件')
     return
@@ -791,17 +709,12 @@ const handleGenerateSubmit = async () => {
   }
 
   generateLoading.value = true
-  try {
-    // 模拟API请求
-    setTimeout(() => {
-      ElMessage.success('批量生成账单成功')
-      generateDialogVisible.value = false
-      fetchData()
-      generateLoading.value = false
-    }, 2000)
-  } catch (error) {
+  setTimeout(() => {
+    ElMessage.success('批量生成账单成功')
+    generateDialogVisible.value = false
+    loadBills()
     generateLoading.value = false
-  }
+  }, 2000)
 }
 
 // 缴费
@@ -817,19 +730,14 @@ const handlePay = (row) => {
 }
 
 // 提交缴费
-const handlePaySubmit = async () => {
+const handlePaySubmit = () => {
   payLoading.value = true
-  try {
-    // 模拟API请求
-    setTimeout(() => {
-      ElMessage.success('缴费成功')
-      payDialogVisible.value = false
-      fetchData()
-      payLoading.value = false
-    }, 1000)
-  } catch (error) {
+  setTimeout(() => {
+    ElMessage.success('缴费成功')
+    payDialogVisible.value = false
+    loadBills()
     payLoading.value = false
-  }
+  }, 1000)
 }
 
 // 查看详情
@@ -843,99 +751,91 @@ const handleExport = () => {
 }
 
 // 提交表单
-const handleSubmit = async () => {
+const handleSubmit = () => {
   if (!formRef.value) return
 
-  try {
-    await formRef.value.validate()
-    submitLoading.value = true
-
-    // 模拟API请求
-    setTimeout(() => {
-      ElMessage.success(isEdit.value ? '编辑成功' : '新增成功')
+  formRef.value.validate((valid) => {
+    if (valid) {
+      ElMessage.success(dialogTitle.value + '成功')
       dialogVisible.value = false
-      fetchData()
-      submitLoading.value = false
-    }, 1000)
-  } catch (error) {
-    submitLoading.value = false
-  }
-}
-
-// 重置表单
-const resetForm = () => {
-  Object.assign(form, {
-    billId: null,
-    billNo: '',
-    ownerId: '',
-    houseId: '',
-    feeTypeId: '',
-    billPeriod: '',
-    amount: 0,
-    dueDate: '',
-    remark: ''
+      loadBills()
+    }
   })
 }
 
-// 对话框关闭
-const handleDialogClose = () => {
-  formRef.value?.resetFields()
-  resetForm()
+// 分页处理
+const handleSizeChange = (val) => {
+  pagination.pageSize = val
+  loadBills()
 }
 
-// 组件挂载
+const handleCurrentChange = (val) => {
+  pagination.current = val
+  loadBills()
+}
+
+// 选择变化
+const handleSelectionChange = (selection) => {
+  selectedRows.value = selection
+}
+
+// 初始化
 onMounted(() => {
-  fetchData()
+  loadBills()
 })
 </script>
 
 <style lang="scss" scoped>
-.app-container {
+.log-container {
+  padding: 20px;
+}
+
+.page-header {
+  margin-bottom: 20px;
+
+  .page-title {
+    margin: 0 0 16px 0;
+    font-size: 24px;
+    font-weight: 600;
+    color: #303133;
+  }
+}
+
+.search-section,
+.action-section {
+  margin-bottom: 20px;
+}
+
+.table-section {
+  background: #fff;
+  border-radius: 4px;
   padding: 20px;
 
-  .search-card {
-    margin-bottom: 20px;
+  .pagination-wrapper {
+    margin-top: 20px;
+    text-align: right;
+  }
+}
 
-    .search-form {
-      .el-form-item {
-        margin-bottom: 0;
-      }
-    }
+.amount-text {
+  color: #f56c6c;
+  font-weight: bold;
+
+  &.paid-full {
+    color: #67c23a;
   }
 
-  .table-card {
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-
-      .header-actions {
-        display: flex;
-        gap: 10px;
-      }
-    }
+  &.paid-partial {
+    color: #e6a23c;
   }
 
-  .amount-text {
+  &.paid-none {
     color: #f56c6c;
-    font-weight: bold;
-
-    &.paid-full {
-      color: #67c23a;
-    }
-
-    &.paid-partial {
-      color: #e6a23c;
-    }
-
-    &.paid-none {
-      color: #f56c6c;
-    }
   }
+}
 
-  .overdue {
-    color: #f56c6c;
-    font-weight: bold;
-  }
+.overdue {
+  color: #f56c6c;
+  font-weight: bold;
 }
 </style>

@@ -182,7 +182,18 @@ const handleLogin = async () => {
         saveLoginInfo()
 
         ElMessage.success('登录成功')
-        router.push('/dashboard')
+
+        // 根据用户类型重定向到不同的首页
+        if (userStore.userType === 3) {
+          // 业主重定向到业主首页
+          router.push('/portal/dashboard')
+        } else if (userStore.userType === 4) {
+          // 维修人员重定向到工作台
+          router.push('/work/pending')
+        } else {
+          // 系统管理员和物业管理员重定向到工作台
+          router.push('/dashboard')
+        }
       } catch (error) {
         console.error('登录失败:', error)
         ElMessage.error(error.message || '登录失败，请检查用户名和密码')

@@ -1,14 +1,19 @@
 <template>
-  <div class="app-container">
+  <div class="log-container">
+    <!-- 页面标题 -->
+    <div class="page-header">
+      <h2 class="page-title">楼栋管理</h2>
+      <el-breadcrumb separator="/">
+        <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+        <el-breadcrumb-item>物业管理</el-breadcrumb-item>
+        <el-breadcrumb-item>楼栋管理</el-breadcrumb-item>
+      </el-breadcrumb>
+    </div>
+
     <!-- 搜索区域 -->
-    <el-card class="search-card">
-      <el-form
-        ref="searchFormRef"
-        :model="searchForm"
-        inline
-        class="search-form"
-      >
-        <el-form-item label="楼栋编号" prop="buildingNo">
+    <div class="search-section">
+      <el-form :model="searchForm" inline>
+        <el-form-item label="楼栋编号">
           <el-input
             v-model="searchForm.buildingNo"
             placeholder="请输入楼栋编号"
@@ -16,8 +21,7 @@
             style="width: 200px"
           />
         </el-form-item>
-
-        <el-form-item label="楼栋名称" prop="buildingName">
+        <el-form-item label="楼栋名称">
           <el-input
             v-model="searchForm.buildingName"
             placeholder="请输入楼栋名称"
@@ -25,8 +29,7 @@
             style="width: 200px"
           />
         </el-form-item>
-
-        <el-form-item label="建筑年份" prop="buildYear">
+        <el-form-item label="建筑年份">
           <el-date-picker
             v-model="searchForm.buildYearRange"
             type="yearrange"
@@ -37,7 +40,6 @@
             style="width: 240px"
           />
         </el-form-item>
-
         <el-form-item>
           <el-button type="primary" @click="handleSearch">
             <el-icon><Search /></el-icon>
@@ -49,104 +51,140 @@
           </el-button>
         </el-form-item>
       </el-form>
-    </el-card>
+    </div>
 
-    <!-- 表格区域 -->
-    <el-card class="table-card">
-      <template #header>
-        <div class="card-header">
-          <span>楼栋列表</span>
-          <div class="header-actions">
-            <el-button
-              type="primary"
-              v-permission="'property:building:add'"
-              @click="handleAdd"
-            >
-              <el-icon><Plus /></el-icon>
-              新增楼栋
-            </el-button>
-            <el-button
-              type="danger"
-              v-permission="'property:building:delete'"
-              :disabled="selectedRows.length === 0"
-              @click="handleBatchDelete"
-            >
-              <el-icon><Delete /></el-icon>
-              批量删除
-            </el-button>
-            <el-button @click="handleExport">
-              <el-icon><Download /></el-icon>
-              导出
-            </el-button>
-          </div>
-        </div>
-      </template>
-
-      <Table
-        ref="tableRef"
-        :data="tableData"
-        :columns="tableColumns"
-        :loading="loading"
-        :pagination="pagination"
-        @selection-change="handleSelectionChange"
-        @page-change="handlePageChange"
-        @sort-change="handleSortChange"
+    <!-- 操作按钮 -->
+    <div class="action-section">
+      <el-button
+        type="primary"
+        @click="handleAdd"
       >
-        <!-- 操作列 -->
-        <template #operation="{ row }">
-          <el-button
-            link
-            type="primary"
-            v-permission="'property:building:edit'"
-            @click="handleEdit(row)"
-          >
-            编辑
-          </el-button>
-          <el-button
-            link
-            type="info"
-            @click="handleViewUnits(row)"
-          >
-            查看单元
-          </el-button>
-          <el-button
-            link
-            type="danger"
-            v-permission="'property:building:delete'"
-            @click="handleDelete(row)"
-          >
-            删除
-          </el-button>
-        </template>
-      </Table>
-    </el-card>
+        <el-icon><Plus /></el-icon>
+        新增楼栋
+      </el-button>
+      <el-button
+        type="danger"
+        :disabled="selectedRows.length === 0"
+        @click="handleBatchDelete"
+      >
+        <el-icon><Delete /></el-icon>
+        批量删除
+      </el-button>
+      <el-button @click="handleExport">
+        <el-icon><Download /></el-icon>
+        导出
+      </el-button>
+    </div>
 
-    <!-- 新增/编辑对话框 -->
+    <!-- 楼栋表格 -->
+    <div class="table-section">
+      <el-table
+        v-loading="loading"
+        :data="tableData"
+        @selection-change="handleSelectionChange"
+      >
+        <el-table-column type="selection" width="55" />
+        <el-table-column prop="buildingNo" label="楼栋编号" width="120" sortable />
+        <el-table-column prop="buildingName" label="楼栋名称" width="150" show-overflow-tooltip />
+        <el-table-column prop="floorCount" label="楼层数" width="100" />
+        <el-table-column prop="unitCount" label="单元数" width="100" />
+        <el-table-column prop="address" label="详细地址" show-overflow-tooltip />
+        <el-table-column prop="buildYear" label="建筑年份" width="120" />
+        <el-table-column prop="createTime" label="创建时间" width="180" sortable>
+          <template #default="{ row }">
+            {{ formatDateTime(row.createTime) }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="remark" label="备注" show-overflow-tooltip />
+        <el-table-column label="操作" width="200" fixed="right">
+          <template #default="{ row }">
+            <el-button
+              link
+              type="primary"
+              @click="handleEdit(row)"
+            >
+              编辑
+            </el-button>
+            <el-button
+              link
+              type="info"
+              @click="handleViewUnits(row)"
+            >
+              查看单元
+            </el-button>
+            <el-button
+              link
+              type="danger"
+              @click="handleDelete(row)"
+            >
+              删除
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+
+      <div class="pagination-wrapper">
+        <el-pagination
+          v-model:current-page="pagination.current"
+          v-model:page-size="pagination.pageSize"
+          :page-sizes="[10, 20, 50, 100]"
+          :total="pagination.total"
+          layout="total, sizes, prev, pager, next, jumper"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+        />
+      </div>
+    </div>
+
+    <!-- 新增/编辑楼栋对话框 -->
     <el-dialog
       v-model="dialogVisible"
       :title="dialogTitle"
       width="600px"
-      @close="handleDialogClose"
     >
-      <Form
+      <el-form
         ref="formRef"
         :model="form"
         :rules="formRules"
-        :items="formItems"
         label-width="100px"
-      />
+      >
+        <el-form-item label="楼栋编号" prop="buildingNo">
+          <el-input v-model="form.buildingNo" placeholder="请输入楼栋编号" />
+        </el-form-item>
+        <el-form-item label="楼栋名称" prop="buildingName">
+          <el-input v-model="form.buildingName" placeholder="请输入楼栋名称" />
+        </el-form-item>
+        <el-form-item label="楼层数" prop="floorCount">
+          <el-input-number v-model="form.floorCount" :min="1" style="width: 100%" />
+        </el-form-item>
+        <el-form-item label="单元数" prop="unitCount">
+          <el-input-number v-model="form.unitCount" :min="1" style="width: 100%" />
+        </el-form-item>
+        <el-form-item label="详细地址" prop="address">
+          <el-input v-model="form.address" placeholder="请输入详细地址" />
+        </el-form-item>
+        <el-form-item label="建筑年份" prop="buildYear">
+          <el-date-picker
+            v-model="form.buildYear"
+            type="year"
+            placeholder="选择建筑年份"
+            style="width: 100%"
+          />
+        </el-form-item>
+        <el-form-item label="备注" prop="remark">
+          <el-input
+            v-model="form.remark"
+            type="textarea"
+            placeholder="请输入备注信息"
+          />
+        </el-form-item>
+      </el-form>
 
       <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="dialogVisible = false">取消</el-button>
-          <el-button
-            type="primary"
-            :loading="submitLoading"
-            @click="handleSubmit"
-          >
-            确定
-          </el-button>
-        </span>
+        <el-button @click="dialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="handleSubmit">
+          确定
+        </el-button>
       </template>
     </el-dialog>
 
@@ -157,13 +195,16 @@
       width="800px"
     >
       <el-table :data="unitData" border>
-        <el-table-column prop="unitCode" label="单元编号" width="120" />
+        <el-table-column prop="unitNo" label="单元编号" width="120" />
         <el-table-column prop="unitName" label="单元名称" width="120" />
         <el-table-column prop="floorCount" label="楼层数" width="100" />
-        <el-table-column prop="roomsPerFloor" label="每层房间数" width="120" />
-        <el-table-column prop="totalRooms" label="总房间数" width="100" />
+        <el-table-column prop="roomCountPerFloor" label="每层房间数" width="120" />
         <el-table-column prop="remark" label="备注" show-overflow-tooltip />
-        <el-table-column prop="createTime" label="创建时间" width="180" />
+        <el-table-column prop="createTime" label="创建时间" width="180">
+          <template #default="{ row }">
+            {{ formatDateTime(row.createTime) }}
+          </template>
+        </el-table-column>
         <el-table-column label="操作" width="120" fixed="right">
           <template #default="{ row }">
             <el-button link type="primary" @click="handleViewHouses(row)">
@@ -174,9 +215,7 @@
       </el-table>
 
       <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="unitDialogVisible = false">关闭</el-button>
-        </span>
+        <el-button @click="unitDialogVisible = false">关闭</el-button>
       </template>
     </el-dialog>
   </div>
@@ -186,20 +225,16 @@
 import { ref, reactive, onMounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search, Refresh, Plus, Delete, Download } from '@element-plus/icons-vue'
-import Table from '@/components/Table/index.vue'
-import Form from '@/components/Form/index.vue'
 
 // 响应式数据
-const searchFormRef = ref()
-const tableRef = ref()
 const formRef = ref()
 const loading = ref(false)
-const submitLoading = ref(false)
 const dialogVisible = ref(false)
 const unitDialogVisible = ref(false)
 const selectedRows = ref([])
 const isEdit = ref(false)
 const unitData = ref([])
+const submitLoading = ref(false)
 
 // 搜索表单
 const searchForm = reactive({
@@ -218,68 +253,10 @@ const pagination = reactive({
   total: 0
 })
 
-// 表格列配置
-const tableColumns = [
-  {
-    type: 'selection',
-    width: '55'
-  },
-  {
-    prop: 'buildingNo',
-    label: '楼栋编号',
-    width: '120',
-    sortable: true
-  },
-  {
-    prop: 'buildingName',
-    label: '楼栋名称',
-    width: '150',
-    sortable: true
-  },
-  {
-    prop: 'floorCount',
-    label: '楼层数',
-    width: '100'
-  },
-  {
-    prop: 'unitCount',
-    label: '单元数',
-    width: '100'
-  },
-  {
-    prop: 'totalHouseholds',
-    label: '总户数',
-    width: '100'
-  },
-  {
-    prop: 'address',
-    label: '详细地址',
-    showOverflowTooltip: true
-  },
-  {
-    prop: 'buildYear',
-    label: '建筑年份',
-    width: '100',
-    sortable: true
-  },
-  {
-    prop: 'createTime',
-    label: '创建时间',
-    width: '180',
-    sortable: true
-  },
-  {
-    prop: 'operation',
-    label: '操作',
-    width: '220',
-    slot: 'operation',
-    fixed: 'right'
-  }
-]
 
 // 表单数据
 const form = reactive({
-  buildingId: null,
+  id: null,
   buildingNo: '',
   buildingName: '',
   floorCount: 1,
@@ -300,207 +277,154 @@ const formRules = {
     { min: 2, max: 50, message: '楼栋名称长度在2到50个字符', trigger: 'blur' }
   ],
   floorCount: [
-    { required: true, message: '请输入楼层数', trigger: 'blur' },
-    { type: 'number', min: 1, max: 99, message: '楼层数必须在1-99之间', trigger: 'blur' }
+    { required: true, message: '请输入楼层数', trigger: 'blur' }
   ],
   unitCount: [
-    { required: true, message: '请输入单元数', trigger: 'blur' },
-    { type: 'number', min: 1, max: 20, message: '单元数必须在1-20之间', trigger: 'blur' }
+    { required: true, message: '请输入单元数', trigger: 'blur' }
   ],
   address: [
     { required: true, message: '请输入详细地址', trigger: 'blur' }
-  ],
-  buildYear: [
-    { required: true, message: '请选择建筑年份', trigger: 'change' },
-    { type: 'number', min: 1900, max: new Date().getFullYear(), message: '请输入有效的建筑年份', trigger: 'blur' }
   ]
 }
-
-// 表单项配置
-const formItems = computed(() => [
-  {
-    prop: 'buildingNo',
-    label: '楼栋编号',
-    type: 'input',
-    placeholder: '请输入楼栋编号（如：A01）',
-    disabled: isEdit.value
-  },
-  {
-    prop: 'buildingName',
-    label: '楼栋名称',
-    type: 'input',
-    placeholder: '请输入楼栋名称（如：1号楼）'
-  },
-  {
-    prop: 'floorCount',
-    label: '楼层数',
-    type: 'input',
-    inputType: 'number',
-    placeholder: '请输入楼层数'
-  },
-  {
-    prop: 'unitCount',
-    label: '单元数',
-    type: 'input',
-    inputType: 'number',
-    placeholder: '请输入单元数'
-  },
-  {
-    prop: 'address',
-    label: '详细地址',
-    type: 'input',
-    placeholder: '请输入详细地址'
-  },
-  {
-    prop: 'buildYear',
-    label: '建筑年份',
-    type: 'input',
-    inputType: 'number',
-    placeholder: '请输入建筑年份'
-  },
-  {
-    prop: 'remark',
-    label: '备注',
-    type: 'textarea',
-    placeholder: '请输入备注信息'
-  }
-])
 
 // 计算属性
 const dialogTitle = computed(() => isEdit.value ? '编辑楼栋' : '新增楼栋')
 
-// 获取模拟数据
-const getMockData = () => {
-  const mockBuildings = [
+// 格式化日期时间
+const formatDateTime = (dateTime) => {
+  if (!dateTime) return '-'
+  return new Date(dateTime).toLocaleString('zh-CN')
+}
+
+// 生成模拟数据
+const generateMockData = () => {
+  const buildings = [
     {
-      buildingId: 1,
+      id: 1,
       buildingNo: 'A01',
       buildingName: '1号楼',
       floorCount: 18,
       unitCount: 3,
-      totalHouseholds: 162,
       address: '北京市朝阳区xx街道xx小区1号楼',
       buildYear: 2020,
-      createTime: '2024-01-01 10:00:00'
+      remark: '高层住宅楼',
+      createTime: new Date('2024-01-01 10:00:00').toISOString()
     },
     {
-      buildingId: 2,
+      id: 2,
       buildingNo: 'A02',
       buildingName: '2号楼',
       floorCount: 24,
       unitCount: 4,
-      totalHouseholds: 288,
       address: '北京市朝阳区xx街道xx小区2号楼',
       buildYear: 2021,
-      createTime: '2024-01-02 10:00:00'
+      remark: '超高层住宅楼',
+      createTime: new Date('2024-01-02 10:00:00').toISOString()
     },
     {
-      buildingId: 3,
+      id: 3,
       buildingNo: 'B01',
       buildingName: '3号楼',
       floorCount: 12,
       unitCount: 2,
-      totalHouseholds: 96,
       address: '北京市朝阳区xx街道xx小区3号楼',
       buildYear: 2019,
-      createTime: '2024-01-03 10:00:00'
+      remark: '小高层住宅楼',
+      createTime: new Date('2024-01-03 10:00:00').toISOString()
     },
     {
-      buildingId: 4,
+      id: 4,
       buildingNo: 'B02',
       buildingName: '4号楼',
       floorCount: 6,
       unitCount: 1,
-      totalHouseholds: 24,
       address: '北京市朝阳区xx街道xx小区4号楼',
       buildYear: 2018,
-      createTime: '2024-01-04 10:00:00'
+      remark: '多层住宅楼',
+      createTime: new Date('2024-01-04 10:00:00').toISOString()
     }
   ]
 
-  // 模拟分页
-  pagination.total = mockBuildings.length
-  return mockBuildings
+  return buildings
 }
 
-// 获取模拟单元数据
-const getMockUnitData = (buildingId) => {
-  const unitCount = [
+// 生成模拟单元数据
+const generateMockUnitData = (buildingId) => {
+  const units = [
     {
-      unitId: 1,
+      id: 1,
       buildingId: 1,
-      unitCode: 'A01-1',
+      unitNo: 'A01-1',
       unitName: '1单元',
       floorCount: 18,
-      roomsPerFloor: 3,
-      totalRooms: 54,
+      roomCountPerFloor: 3,
       remark: '一梯三户',
-      createTime: '2024-01-01 10:00:00'
+      createTime: new Date('2024-01-01 10:00:00').toISOString()
     },
     {
-      unitId: 2,
+      id: 2,
       buildingId: 1,
-      unitCode: 'A01-2',
+      unitNo: 'A01-2',
       unitName: '2单元',
       floorCount: 18,
-      roomsPerFloor: 3,
-      totalRooms: 54,
+      roomCountPerFloor: 3,
       remark: '一梯三户',
-      createTime: '2024-01-01 10:00:00'
+      createTime: new Date('2024-01-01 10:00:00').toISOString()
     },
     {
-      unitId: 3,
+      id: 3,
       buildingId: 1,
-      unitCode: 'A01-3',
+      unitNo: 'A01-3',
       unitName: '3单元',
       floorCount: 18,
-      roomsPerFloor: 3,
-      totalRooms: 54,
+      roomCountPerFloor: 3,
       remark: '一梯三户',
-      createTime: '2024-01-01 10:00:00'
+      createTime: new Date('2024-01-01 10:00:00').toISOString()
     }
   ]
 
-  return unitCount.filter(unit => unit.buildingId === buildingId)
+  return units.filter(unit => unit.buildingId === buildingId)
 }
 
 // 搜索
 const handleSearch = () => {
   pagination.current = 1
-  fetchData()
+  loadBuildings()
 }
 
 // 重置
 const handleReset = () => {
-  searchFormRef.value?.resetFields()
+  Object.assign(searchForm, {
+    buildingNo: '',
+    buildingName: '',
+    buildYearRange: []
+  })
   handleSearch()
 }
 
-// 获取数据
-const fetchData = async () => {
+// 加载楼栋数据
+const loadBuildings = () => {
   loading.value = true
-  try {
-    // 模拟API请求
-    setTimeout(() => {
-      tableData.value = getMockData()
-      loading.value = false
-    }, 500)
-  } catch (error) {
+  setTimeout(() => {
+    const mockData = generateMockData()
+    tableData.value = mockData.slice(
+      (pagination.current - 1) * pagination.pageSize,
+      pagination.current * pagination.pageSize
+    )
+    pagination.total = mockData.length
     loading.value = false
-    ElMessage.error('获取数据失败')
-  }
+  }, 500)
 }
 
-// 分页变化
-const handlePageChange = (page) => {
-  pagination.current = page
-  fetchData()
+// 分页处理
+const handleSizeChange = (val) => {
+  pagination.pageSize = val
+  loadBuildings()
 }
 
-// 排序变化
-const handleSortChange = (sort) => {
-  console.log('排序变化:', sort)
-  fetchData()
+const handleCurrentChange = (val) => {
+  pagination.current = val
+  loadBuildings()
 }
 
 // 选择变化
@@ -531,7 +455,7 @@ const handleDelete = async (row) => {
       { type: 'warning' }
     )
     ElMessage.success('删除成功')
-    fetchData()
+    loadBuildings()
   } catch (error) {
     // 用户取消操作
   }
@@ -546,7 +470,7 @@ const handleBatchDelete = async () => {
       { type: 'warning' }
     )
     ElMessage.success('批量删除成功')
-    fetchData()
+    loadBuildings()
   } catch (error) {
     // 用户取消操作
   }
@@ -554,7 +478,7 @@ const handleBatchDelete = async () => {
 
 // 查看单元
 const handleViewUnits = (row) => {
-  unitData.value = getMockUnitData(row.buildingId)
+  unitData.value = generateMockUnitData(row.id)
   unitDialogVisible.value = true
 }
 
@@ -583,7 +507,7 @@ const handleSubmit = async () => {
     setTimeout(() => {
       ElMessage.success(isEdit.value ? '编辑成功' : '新增成功')
       dialogVisible.value = false
-      fetchData()
+      loadBuildings()
       submitLoading.value = false
     }, 1000)
   } catch (error) {
@@ -594,7 +518,7 @@ const handleSubmit = async () => {
 // 重置表单
 const resetForm = () => {
   Object.assign(form, {
-    buildingId: null,
+    id: null,
     buildingNo: '',
     buildingName: '',
     floorCount: 1,
@@ -611,37 +535,41 @@ const handleDialogClose = () => {
   resetForm()
 }
 
-// 组件挂载
+// 初始化
 onMounted(() => {
-  fetchData()
+  loadBuildings()
 })
 </script>
 
 <style lang="scss" scoped>
-.app-container {
+.log-container {
+  padding: 20px;
+}
+
+.page-header {
+  margin-bottom: 20px;
+
+  .page-title {
+    margin: 0 0 16px 0;
+    font-size: 24px;
+    font-weight: 600;
+    color: #303133;
+  }
+}
+
+.search-section,
+.action-section {
+  margin-bottom: 20px;
+}
+
+.table-section {
+  background: #fff;
+  border-radius: 4px;
   padding: 20px;
 
-  .search-card {
-    margin-bottom: 20px;
-
-    .search-form {
-      .el-form-item {
-        margin-bottom: 0;
-      }
-    }
-  }
-
-  .table-card {
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-
-      .header-actions {
-        display: flex;
-        gap: 10px;
-      }
-    }
+  .pagination-wrapper {
+    margin-top: 20px;
+    text-align: right;
   }
 }
 </style>

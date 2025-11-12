@@ -5,7 +5,6 @@
       <h2 class="page-title">系统日志</h2>
       <el-breadcrumb separator="/">
         <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-        <el-breadcrumb-item>系统管理</el-breadcrumb-item>
         <el-breadcrumb-item>系统日志</el-breadcrumb-item>
       </el-breadcrumb>
     </div>
@@ -364,9 +363,14 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search, Refresh, Delete, Download } from '@element-plus/icons-vue'
+
+// Router
+const router = useRouter()
+const route = useRoute()
 
 // 响应式数据
 const activeTab = ref('operation')
@@ -518,8 +522,10 @@ const loadLoginLogs = () => {
 // 标签页切换
 const handleTabChange = (tabName) => {
   if (tabName === 'operation') {
+    router.push('/log/operation')
     loadOperationLogs()
   } else {
+    router.push('/log/login')
     loadLoginLogs()
   }
 }
@@ -640,8 +646,36 @@ const handleLoginCurrentChange = (val) => {
   loadLoginLogs()
 }
 
+// 初始化设置活动标签页
+const initializeActiveTab = () => {
+  const path = route.path
+  if (path.includes('/log/operation')) {
+    activeTab.value = 'operation'
+    loadOperationLogs()
+  } else if (path.includes('/log/login')) {
+    activeTab.value = 'login'
+    loadLoginLogs()
+  } else {
+    // 默认加载操作日志
+    activeTab.value = 'operation'
+    loadOperationLogs()
+  }
+}
+
+// 监听路由变化
+watch(
+  () => route.path,
+  (newPath) => {
+    if (newPath.includes('/log/operation')) {
+      activeTab.value = 'operation'
+    } else if (newPath.includes('/log/login')) {
+      activeTab.value = 'login'
+    }
+  }
+)
+
 onMounted(() => {
-  loadOperationLogs()
+  initializeActiveTab()
 })
 </script>
 

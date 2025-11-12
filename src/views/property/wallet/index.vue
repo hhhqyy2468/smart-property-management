@@ -1,14 +1,19 @@
 <template>
-  <div class="app-container">
+  <div class="log-container">
+    <!-- 页面标题 -->
+    <div class="page-header">
+      <h2 class="page-title">虚拟钱包管理</h2>
+      <el-breadcrumb separator="/">
+        <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+        <el-breadcrumb-item>费用管理</el-breadcrumb-item>
+        <el-breadcrumb-item>虚拟钱包管理</el-breadcrumb-item>
+      </el-breadcrumb>
+    </div>
+
     <!-- 搜索区域 -->
-    <el-card class="search-card">
-      <el-form
-        ref="searchFormRef"
-        :model="searchForm"
-        inline
-        class="search-form"
-      >
-        <el-form-item label="业主姓名" prop="ownerName">
+    <div class="search-section">
+      <el-form :model="searchForm" inline>
+        <el-form-item label="业主姓名">
           <el-input
             v-model="searchForm.ownerName"
             placeholder="请输入业主姓名"
@@ -16,8 +21,7 @@
             style="width: 200px"
           />
         </el-form-item>
-
-        <el-form-item label="手机号" prop="phone">
+        <el-form-item label="手机号">
           <el-input
             v-model="searchForm.phone"
             placeholder="请输入手机号"
@@ -25,8 +29,7 @@
             style="width: 200px"
           />
         </el-form-item>
-
-        <el-form-item label="钱包状态" prop="walletStatus">
+        <el-form-item label="钱包状态">
           <el-select
             v-model="searchForm.walletStatus"
             placeholder="请选择钱包状态"
@@ -37,7 +40,6 @@
             <el-option label="冻结" :value="0" />
           </el-select>
         </el-form-item>
-
         <el-form-item>
           <el-button type="primary" @click="handleSearch">
             <el-icon><Search /></el-icon>
@@ -49,97 +51,123 @@
           </el-button>
         </el-form-item>
       </el-form>
-    </el-card>
+    </div>
 
-    <!-- 表格区域 -->
-    <el-card class="table-card">
-      <template #header>
-        <div class="card-header">
-          <span>钱包列表</span>
-          <div class="header-actions">
-            <el-button
-              type="success"
-              v-permission="'property:wallet:recharge'"
-              @click="handleBatchRecharge"
-            >
-              <el-icon><CreditCard /></el-icon>
-              批量充值
-            </el-button>
-            <el-button @click="handleExport">
-              <el-icon><Download /></el-icon>
-              导出
-            </el-button>
-          </div>
-        </div>
-      </template>
-
-      <Table
-        ref="tableRef"
-        :data="tableData"
-        :columns="tableColumns"
-        :loading="loading"
-        :pagination="pagination"
-        @page-change="handlePageChange"
-        @sort-change="handleSortChange"
+    <!-- 操作按钮 -->
+    <div class="action-section">
+      <el-button
+        type="success"
+        @click="handleBatchRecharge"
       >
-        <!-- 当前余额列 -->
-        <template #currentBalance="{ row }">
-          <span class="balance-text">¥{{ row.currentBalance.toFixed(2) }}</span>
-        </template>
+        <el-icon><CreditCard /></el-icon>
+        批量充值
+      </el-button>
+      <el-button @click="handleExport">
+        <el-icon><Download /></el-icon>
+        导出
+      </el-button>
+    </div>
 
-        <!-- 钱包状态列 -->
-        <template #walletStatus="{ row }">
-          <el-tag :type="row.walletStatus === 1 ? 'success' : 'danger'">
-            {{ row.walletStatus === 1 ? '正常' : '冻结' }}
-          </el-tag>
-        </template>
+    <!-- 钱包表格 -->
+    <div class="table-section">
+      <el-table
+        v-loading="loading"
+        :data="tableData"
+        @selection-change="handleSelectionChange"
+      >
+        <el-table-column type="selection" width="55" />
+        <el-table-column prop="ownerName" label="业主姓名" width="120" sortable />
+        <el-table-column prop="phone" label="手机号" width="130" />
+        <el-table-column prop="walletNo" label="钱包编号" width="160" />
+        <el-table-column prop="currentBalance" label="当前余额" width="120" sortable>
+          <template #default="{ row }">
+            <span class="balance-text">¥{{ row.currentBalance.toFixed(2) }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="totalRecharge" label="累计充值" width="120">
+          <template #default="{ row }">
+            <span class="amount-text success">¥{{ row.totalRecharge.toFixed(2) }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="totalConsume" label="累计消费" width="120">
+          <template #default="{ row }">
+            <span class="amount-text danger">¥{{ row.totalConsume.toFixed(2) }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="walletStatus" label="钱包状态" width="100">
+          <template #default="{ row }">
+            <el-tag :type="row.walletStatus === 1 ? 'success' : 'danger'">
+              {{ row.walletStatus === 1 ? '正常' : '冻结' }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="hasPassword" label="支付密码" width="100">
+          <template #default="{ row }">
+            <el-tag :type="row.hasPassword ? 'success' : 'warning'">
+              {{ row.hasPassword ? '已设置' : '未设置' }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="createTime" label="创建时间" width="180" sortable>
+          <template #default="{ row }">
+            {{ formatDateTime(row.createTime) }}
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="320" fixed="right">
+          <template #default="{ row }">
+            <el-button
+              link
+              type="primary"
+              @click="handleViewDetail(row)"
+            >
+              详情
+            </el-button>
+            <el-button
+              link
+              type="success"
+              @click="handleRecharge(row)"
+            >
+              充值
+            </el-button>
+            <el-button
+              link
+              type="warning"
+              @click="handleResetPassword(row)"
+            >
+              重置密码
+            </el-button>
+            <el-button
+              link
+              type="danger"
+              @click="handleFreeze(row)"
+              v-if="row.walletStatus === 1"
+            >
+              冻结
+            </el-button>
+            <el-button
+              link
+              type="success"
+              @click="handleUnfreeze(row)"
+              v-else
+            >
+              解冻
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
 
-        <!-- 操作列 -->
-        <template #operation="{ row }">
-          <el-button
-            link
-            type="primary"
-            @click="handleViewDetail(row)"
-          >
-            详情
-          </el-button>
-          <el-button
-            link
-            type="success"
-            v-permission="'property:wallet:recharge'"
-            @click="handleRecharge(row)"
-          >
-            充值
-          </el-button>
-          <el-button
-            link
-            type="warning"
-            v-permission="'property:wallet:resetPassword'"
-            @click="handleResetPassword(row)"
-          >
-            重置密码
-          </el-button>
-          <el-button
-            link
-            type="danger"
-            v-permission="'property:wallet:freeze'"
-            @click="handleFreeze(row)"
-            v-if="row.walletStatus === 1"
-          >
-            冻结
-          </el-button>
-          <el-button
-            link
-            type="success"
-            v-permission="'property:wallet:freeze'"
-            @click="handleUnfreeze(row)"
-            v-else
-          >
-            解冻
-          </el-button>
-        </template>
-      </Table>
-    </el-card>
+      <div class="pagination-wrapper">
+        <el-pagination
+          v-model:current-page="pagination.current"
+          v-model:page-size="pagination.pageSize"
+          :page-sizes="[10, 20, 50, 100]"
+          :total="pagination.total"
+          layout="total, sizes, prev, pager, next, jumper"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+        />
+      </div>
+    </div>
 
     <!-- 钱包详情对话框 -->
     <el-dialog
@@ -243,9 +271,7 @@
       </el-tabs>
 
       <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="detailDialogVisible = false">关闭</el-button>
-        </span>
+        <el-button @click="detailDialogVisible = false">关闭</el-button>
       </template>
     </el-dialog>
 
@@ -293,16 +319,14 @@
       </el-form>
 
       <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="rechargeDialogVisible = false">取消</el-button>
-          <el-button
-            type="primary"
-            :loading="rechargeLoading"
-            @click="handleRechargeSubmit"
-          >
-            确认充值
-          </el-button>
-        </span>
+        <el-button @click="rechargeDialogVisible = false">取消</el-button>
+        <el-button
+          type="primary"
+          :loading="rechargeLoading"
+          @click="handleRechargeSubmit"
+        >
+          确认充值
+        </el-button>
       </template>
     </el-dialog>
 
@@ -351,16 +375,14 @@
       </el-form>
 
       <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="batchRechargeDialogVisible = false">取消</el-button>
-          <el-button
-            type="primary"
-            :loading="batchRechargeLoading"
-            @click="handleBatchRechargeSubmit"
-          >
-            确认批量充值
-          </el-button>
-        </span>
+        <el-button @click="batchRechargeDialogVisible = false">取消</el-button>
+        <el-button
+          type="primary"
+          :loading="batchRechargeLoading"
+          @click="handleBatchRechargeSubmit"
+        >
+          确认批量充值
+        </el-button>
       </template>
     </el-dialog>
   </div>
@@ -370,11 +392,9 @@
 import { ref, reactive, onMounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search, Refresh, Download, CreditCard } from '@element-plus/icons-vue'
-import Table from '@/components/Table/index.vue'
 
 // 响应式数据
-const searchFormRef = ref()
-const tableRef = ref()
+const formRef = ref()
 const rechargeFormRef = ref()
 const batchRechargeFormRef = ref()
 const loading = ref(false)
@@ -383,6 +403,7 @@ const batchRechargeLoading = ref(false)
 const detailDialogVisible = ref(false)
 const rechargeDialogVisible = ref(false)
 const batchRechargeDialogVisible = ref(false)
+const selectedRows = ref([])
 const activeTab = ref('basic')
 
 // 搜索表单
@@ -396,6 +417,7 @@ const searchForm = reactive({
 const tableData = ref([])
 const rechargeData = ref([])
 const consumeData = ref([])
+const currentWallet = ref({})
 
 // 分页配置
 const pagination = reactive({
@@ -403,70 +425,6 @@ const pagination = reactive({
   pageSize: 10,
   total: 0
 })
-
-// 表格列配置
-const tableColumns = [
-  {
-    prop: 'ownerName',
-    label: '业主姓名',
-    width: '120',
-    sortable: true
-  },
-  {
-    prop: 'phone',
-    label: '手机号',
-    width: '130'
-  },
-  {
-    prop: 'walletNo',
-    label: '钱包编号',
-    width: '160'
-  },
-  {
-    prop: 'currentBalance',
-    label: '当前余额',
-    width: '120',
-    slot: 'currentBalance',
-    sortable: true
-  },
-  {
-    prop: 'totalRecharge',
-    label: '累计充值',
-    width: '120',
-    formatter: (row) => `¥${row.totalRecharge.toFixed(2)}`
-  },
-  {
-    prop: 'totalConsume',
-    label: '累计消费',
-    width: '120',
-    formatter: (row) => `¥${row.totalConsume.toFixed(2)}`
-  },
-  {
-    prop: 'walletStatus',
-    label: '钱包状态',
-    width: '100',
-    slot: 'walletStatus'
-  },
-  {
-    prop: 'hasPassword',
-    label: '支付密码',
-    width: '100',
-    formatter: (row) => row.hasPassword ? '已设置' : '未设置'
-  },
-  {
-    prop: 'createTime',
-    label: '创建时间',
-    width: '180',
-    sortable: true
-  },
-  {
-    prop: 'operation',
-    label: '操作',
-    width: '300',
-    slot: 'operation',
-    fixed: 'right'
-  }
-]
 
 // 选项数据
 const paymentMethodOptions = ref([
@@ -481,9 +439,6 @@ const consumeTypeOptions = ref([
   { label: '停车费', value: 'parking_fee' },
   { label: '其他费用', value: 'other' }
 ])
-
-// 当前钱包
-const currentWallet = ref({})
 
 // 充值表单
 const rechargeForm = reactive({
@@ -525,6 +480,12 @@ const batchRechargeRules = {
   ]
 }
 
+// 格式化日期时间
+const formatDateTime = (dateTime) => {
+  if (!dateTime) return '-'
+  return new Date(dateTime).toLocaleString('zh-CN')
+}
+
 // 获取支付方式名称
 const getPaymentMethodName = (method) => {
   const option = paymentMethodOptions.value.find(item => item.value === method)
@@ -537,9 +498,9 @@ const getConsumeTypeName = (type) => {
   return option ? option.label : '未知'
 }
 
-// 获取模拟数据
-const getMockData = () => {
-  const mockWallets = []
+// 生成模拟数据
+const generateMockData = () => {
+  const wallets = []
   const owners = ['张三', '李四', '王五', '赵六', '钱七', '孙八', '周九', '吴十', '郑一', '冯二']
 
   for (let i = 0; i < 50; i++) {
@@ -547,7 +508,7 @@ const getMockData = () => {
     const totalRecharge = currentBalance + Math.floor(Math.random() * 5000)
     const totalConsume = totalRecharge - currentBalance
 
-    mockWallets.push({
+    wallets.push({
       walletId: i + 1,
       ownerName: owners[i % owners.length],
       phone: '138****' + Math.floor(Math.random() * 10000).toString().padStart(4, '0'),
@@ -555,20 +516,18 @@ const getMockData = () => {
       currentBalance: currentBalance,
       totalRecharge: totalRecharge,
       totalConsume: totalConsume,
-      walletStatus: Math.random() > 0.9 ? 2 : 1, // 10%冻结
+      walletStatus: Math.random() > 0.9 ? 0 : 1, // 10%冻结
       hasPassword: Math.random() > 0.2, // 80%已设置密码
-      createTime: '2024-01-01 10:00:00',
-      updateTime: '2024-01-15 14:30:00'
+      createTime: new Date('2024-01-01 10:00:00').toISOString(),
+      updateTime: new Date('2024-01-15 14:30:00').toISOString()
     })
   }
 
-  // 模拟分页
-  pagination.total = mockWallets.length
-  return mockWallets
+  return wallets
 }
 
-// 获取模拟充值记录
-const getMockRechargeData = (walletId) => {
+// 生成模拟充值记录
+const generateMockRechargeData = (walletId) => {
   const records = []
   for (let i = 0; i < 10; i++) {
     records.push({
@@ -576,15 +535,15 @@ const getMockRechargeData = (walletId) => {
       amount: 100 + Math.floor(Math.random() * 1000),
       paymentMethod: ['cash', 'bank', 'wechat', 'alipay'][Math.floor(Math.random() * 4)],
       status: Math.random() > 0.1 ? 1 : 0,
-      createTime: `2024-01-${(Math.floor(Math.random() * 28) + 1).toString().padStart(2, '0')} 10:${Math.floor(Math.random() * 60).toString().padStart(2, '0')}:00`,
+      createTime: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
       remark: i % 3 === 0 ? '定期充值' : '临时充值'
     })
   }
   return records
 }
 
-// 获取模拟消费记录
-const getMockConsumeData = (walletId) => {
+// 生成模拟消费记录
+const generateMockConsumeData = (walletId) => {
   const records = []
   for (let i = 0; i < 15; i++) {
     records.push({
@@ -593,57 +552,53 @@ const getMockConsumeData = (walletId) => {
       type: ['property_fee', 'parking_fee', 'other'][Math.floor(Math.random() * 3)],
       relatedBillNo: `BILL${Math.floor(Math.random() * 100000).toString().padStart(6, '0')}`,
       status: Math.random() > 0.05 ? 1 : 0,
-      createTime: `2024-01-${(Math.floor(Math.random() * 28) + 1).toString().padStart(2, '0')} 10:${Math.floor(Math.random() * 60).toString().padStart(2, '0')}:00`,
+      createTime: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
       remark: '自动扣费'
     })
   }
   return records
 }
 
+// 加载钱包数据
+const loadWallets = () => {
+  loading.value = true
+  setTimeout(() => {
+    const mockData = generateMockData()
+    tableData.value = mockData.slice(
+      (pagination.current - 1) * pagination.pageSize,
+      pagination.current * pagination.pageSize
+    )
+    pagination.total = mockData.length
+    loading.value = false
+  }, 500)
+}
+
 // 搜索
 const handleSearch = () => {
   pagination.current = 1
-  fetchData()
+  loadWallets()
 }
 
 // 重置
 const handleReset = () => {
-  searchFormRef.value?.resetFields()
+  Object.assign(searchForm, {
+    ownerName: '',
+    phone: '',
+    walletStatus: ''
+  })
   handleSearch()
 }
 
-// 获取数据
-const fetchData = async () => {
-  loading.value = true
-  try {
-    // 模拟API请求
-    setTimeout(() => {
-      tableData.value = getMockData()
-      loading.value = false
-    }, 500)
-  } catch (error) {
-    loading.value = false
-    ElMessage.error('获取数据失败')
-  }
-}
-
-// 分页变化
-const handlePageChange = (page) => {
-  pagination.current = page
-  fetchData()
-}
-
-// 排序变化
-const handleSortChange = (sort) => {
-  console.log('排序变化:', sort)
-  fetchData()
+// 选择变化
+const handleSelectionChange = (selection) => {
+  selectedRows.value = selection
 }
 
 // 查看详情
 const handleViewDetail = (row) => {
   currentWallet.value = { ...row }
-  rechargeData.value = getMockRechargeData(row.walletId)
-  consumeData.value = getMockConsumeData(row.walletId)
+  rechargeData.value = generateMockRechargeData(row.walletId)
+  consumeData.value = generateMockConsumeData(row.walletId)
   activeTab.value = 'basic'
   detailDialogVisible.value = true
 }
@@ -662,23 +617,20 @@ const handleRecharge = (row) => {
 }
 
 // 提交充值
-const handleRechargeSubmit = async () => {
+const handleRechargeSubmit = () => {
   if (!rechargeFormRef.value) return
 
-  try {
-    await rechargeFormRef.value.validate()
-    rechargeLoading.value = true
-
-    // 模拟API请求
-    setTimeout(() => {
-      ElMessage.success('充值成功')
-      rechargeDialogVisible.value = false
-      fetchData()
-      rechargeLoading.value = false
-    }, 1000)
-  } catch (error) {
-    rechargeLoading.value = false
-  }
+  rechargeFormRef.value.validate((valid) => {
+    if (valid) {
+      rechargeLoading.value = true
+      setTimeout(() => {
+        ElMessage.success('充值成功')
+        rechargeDialogVisible.value = false
+        loadWallets()
+        rechargeLoading.value = false
+      }, 1000)
+    }
+  })
 }
 
 // 批量充值
@@ -694,67 +646,73 @@ const handleBatchRecharge = () => {
 }
 
 // 提交批量充值
-const handleBatchRechargeSubmit = async () => {
+const handleBatchRechargeSubmit = () => {
   if (!batchRechargeFormRef.value) return
 
-  try {
-    await batchRechargeFormRef.value.validate()
-    batchRechargeLoading.value = true
-
-    // 模拟API请求
-    setTimeout(() => {
-      ElMessage.success('批量充值成功')
-      batchRechargeDialogVisible.value = false
-      fetchData()
-      batchRechargeLoading.value = false
-    }, 2000)
-  } catch (error) {
-    batchRechargeLoading.value = false
-  }
+  batchRechargeFormRef.value.validate((valid) => {
+    if (valid) {
+      batchRechargeLoading.value = true
+      setTimeout(() => {
+        ElMessage.success('批量充值成功')
+        batchRechargeDialogVisible.value = false
+        loadWallets()
+        batchRechargeLoading.value = false
+      }, 2000)
+    }
+  })
 }
 
 // 重置密码
-const handleResetPassword = async (row) => {
-  try {
-    await ElMessageBox.confirm(
-      `确定要重置业主"${row.ownerName}"的支付密码吗？`,
-      '提示',
-      { type: 'warning' }
-    )
+const handleResetPassword = (row) => {
+  ElMessageBox.confirm(
+    `确定要重置业主"${row.ownerName}"的支付密码吗？`,
+    '提示',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    }
+  ).then(() => {
     ElMessage.success('密码重置成功，新密码为：123456')
-  } catch (error) {
+  }).catch(() => {
     // 用户取消操作
-  }
+  })
 }
 
 // 冻结钱包
-const handleFreeze = async (row) => {
-  try {
-    await ElMessageBox.confirm(
-      `确定要冻结业主"${row.ownerName}"的钱包吗？`,
-      '提示',
-      { type: 'warning' }
-    )
+const handleFreeze = (row) => {
+  ElMessageBox.confirm(
+    `确定要冻结业主"${row.ownerName}"的钱包吗？`,
+    '提示',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    }
+  ).then(() => {
     ElMessage.success('钱包冻结成功')
-    fetchData()
-  } catch (error) {
+    loadWallets()
+  }).catch(() => {
     // 用户取消操作
-  }
+  })
 }
 
 // 解冻钱包
-const handleUnfreeze = async (row) => {
-  try {
-    await ElMessageBox.confirm(
-      `确定要解冻业主"${row.ownerName}"的钱包吗？`,
-      '提示',
-      { type: 'warning' }
-    )
+const handleUnfreeze = (row) => {
+  ElMessageBox.confirm(
+    `确定要解冻业主"${row.ownerName}"的钱包吗？`,
+    '提示',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    }
+  ).then(() => {
     ElMessage.success('钱包解冻成功')
-    fetchData()
-  } catch (error) {
+    loadWallets()
+  }).catch(() => {
     // 用户取消操作
-  }
+  })
 }
 
 // 导出
@@ -762,55 +720,70 @@ const handleExport = () => {
   ElMessage.success('导出成功')
 }
 
-// 组件挂载
+// 分页处理
+const handleSizeChange = (val) => {
+  pagination.pageSize = val
+  loadWallets()
+}
+
+const handleCurrentChange = (val) => {
+  pagination.current = val
+  loadWallets()
+}
+
+// 初始化
 onMounted(() => {
-  fetchData()
+  loadWallets()
 })
 </script>
 
 <style lang="scss" scoped>
-.app-container {
+.log-container {
+  padding: 20px;
+}
+
+.page-header {
+  margin-bottom: 20px;
+
+  .page-title {
+    margin: 0 0 16px 0;
+    font-size: 24px;
+    font-weight: 600;
+    color: #303133;
+  }
+}
+
+.search-section,
+.action-section {
+  margin-bottom: 20px;
+}
+
+.table-section {
+  background: #fff;
+  border-radius: 4px;
   padding: 20px;
 
-  .search-card {
-    margin-bottom: 20px;
-
-    .search-form {
-      .el-form-item {
-        margin-bottom: 0;
-      }
-    }
+  .pagination-wrapper {
+    margin-top: 20px;
+    text-align: right;
   }
+}
 
-  .table-card {
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+.balance-text {
+  color: #67c23a;
+  font-weight: bold;
+  font-size: 16px;
+}
 
-      .header-actions {
-        display: flex;
-        gap: 10px;
-      }
-    }
-  }
+.amount-text {
+  font-weight: bold;
 
-  .balance-text {
+  &.success {
     color: #67c23a;
-    font-weight: bold;
-    font-size: 16px;
   }
 
-  .amount-text {
-    font-weight: bold;
-
-    &.success {
-      color: #67c23a;
-    }
-
-    &.danger {
-      color: #f56c6c;
-    }
+  &.danger {
+    color: #f56c6c;
   }
 }
 </style>
