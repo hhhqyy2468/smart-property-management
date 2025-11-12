@@ -1,5 +1,5 @@
 <template>
-  <div class="owner-container">
+  <div class="log-container">
     <!-- 页面标题 -->
     <div class="page-header">
       <h2 class="page-title">业主管理</h2>

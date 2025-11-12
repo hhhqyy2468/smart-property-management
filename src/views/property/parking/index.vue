@@ -1,12 +1,21 @@
 <template>
-  <div class="app-container">
+  <div class="log-container">
+    <!-- 页面标题 -->
+    <div class="page-header">
+      <h2 class="page-title">停车管理</h2>
+      <el-breadcrumb separator="/">
+        <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+        <el-breadcrumb-item>物业管理</el-breadcrumb-item>
+        <el-breadcrumb-item>停车管理</el-breadcrumb-item>
+      </el-breadcrumb>
+    </div>
+
     <!-- 搜索区域 -->
-    <el-card class="search-card">
+    <div class="search-section">
       <el-form
         ref="searchFormRef"
         :model="searchForm"
         inline
-        class="search-form"
       >
         <el-form-item label="车位编号" prop="parkingNo">
           <el-input
@@ -69,29 +78,25 @@
           </el-button>
         </el-form-item>
       </el-form>
-    </el-card>
+    </div>
 
-    <!-- 表格区域 -->
-    <el-card class="table-card">
-      <template #header>
-        <div class="card-header">
-          <span>车位列表</span>
-          <div class="header-actions">
-            <el-button
-              type="primary"
-              v-permission="'property:parking:add'"
-              @click="handleAdd"
-            >
-              <el-icon><Plus /></el-icon>
-              新增车位
-            </el-button>
-            <el-button @click="handleExport">
-              <el-icon><Download /></el-icon>
-              导出
-            </el-button>
-          </div>
-        </div>
-      </template>
+    <!-- 操作按钮 -->
+    <div class="action-section">
+      <el-button
+        type="primary"
+        @click="handleAdd"
+      >
+        <el-icon><Plus /></el-icon>
+        新增车位
+      </el-button>
+      <el-button @click="handleExport">
+        <el-icon><Download /></el-icon>
+        导出
+      </el-button>
+    </div>
+
+    <!-- 车位表格 -->
+    <div class="table-section">
 
       <Table
         ref="tableRef"
@@ -153,7 +158,19 @@
           </el-button>
         </template>
       </Table>
-    </el-card>
+
+      <div class="pagination-wrapper">
+        <el-pagination
+          v-model:current-page="pagination.current"
+          v-model:page-size="pagination.pageSize"
+          :page-sizes="[10, 20, 50, 100]"
+          :total="pagination.total"
+          layout="total, sizes, prev, pager, next, jumper"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+        />
+      </div>
+    </div>
 
     <!-- 新增/编辑对话框 -->
     <el-dialog
@@ -588,6 +605,18 @@ const handlePageChange = (page) => {
   fetchData()
 }
 
+// 分页大小变化
+const handleSizeChange = (val) => {
+  pagination.pageSize = val
+  fetchData()
+}
+
+// 当前页变化
+const handleCurrentChange = (val) => {
+  pagination.current = val
+  fetchData()
+}
+
 // 排序变化
 const handleSortChange = (sort) => {
   console.log('排序变化:', sort)
@@ -716,35 +745,39 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-.app-container {
+.log-container {
+  padding: 20px;
+}
+
+.page-header {
+  margin-bottom: 20px;
+
+  .page-title {
+    margin: 0 0 16px 0;
+    font-size: 24px;
+    font-weight: 600;
+    color: #303133;
+  }
+}
+
+.search-section,
+.action-section {
+  margin-bottom: 20px;
+}
+
+.table-section {
+  background: #fff;
+  border-radius: 4px;
   padding: 20px;
 
-  .search-card {
-    margin-bottom: 20px;
-
-    .search-form {
-      .el-form-item {
-        margin-bottom: 0;
-      }
-    }
+  .pagination-wrapper {
+    margin-top: 20px;
+    text-align: right;
   }
+}
 
-  .table-card {
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-
-      .header-actions {
-        display: flex;
-        gap: 10px;
-      }
-    }
-  }
-
-  .price-text {
-    color: #f56c6c;
-    font-weight: bold;
-  }
+.price-text {
+  color: #f56c6c;
+  font-weight: bold;
 }
 </style>

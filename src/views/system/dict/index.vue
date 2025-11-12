@@ -1,11 +1,10 @@
 <template>
-  <div class="dict-container">
+  <div class="log-container">
     <!-- 页面标题 -->
     <div class="page-header">
       <h2 class="page-title">字典管理</h2>
       <el-breadcrumb separator="/">
         <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-        <el-breadcrumb-item>系统管理</el-breadcrumb-item>
         <el-breadcrumb-item>字典管理</el-breadcrumb-item>
       </el-breadcrumb>
     </div>
